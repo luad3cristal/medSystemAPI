@@ -34,6 +34,8 @@ public class Doctor {
   @JoinColumn(name = "address_id")
   private Address address;
 
+  private Boolean status = true;
+
   public Doctor () {}
 
   public Doctor (String name, String email, String phone, String crm, Specialty specialty, Address address) {
@@ -62,4 +64,7 @@ public class Doctor {
 
   public Address getAddress() { return address; }
   public void setAddress(Address address) { this.address = address; }
+
+  public Boolean getStatus() { return status; }
+  public void setStatus(Boolean status) { this.status = status; }
 }
