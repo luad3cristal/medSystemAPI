@@ -47,6 +47,9 @@ public class Doctor {
     this.address = address;
   }
 
+  public Long getId() { return id; }
+  public void setId(Long id) { this.id = id; }
+
   public String getName() { return name; }
   public void setName(String name) { this.name = name; }
 
@@ -59,8 +62,8 @@ public class Doctor {
   public String getCRM() { return crm; }
   public void setCRM(String crm) { this.crm = crm; }
 
-  public Specialty getCity() { return specialty; }
-  public void setCity(Specialty specialty) { this.specialty = specialty; }
+  public Specialty getSpecialty() { return specialty; }
+  public void setSpecialty(Specialty specialty) { this.specialty = specialty; }
 
   public Address getAddress() { return address; }
   public void setAddress(Address address) { this.address = address; }
