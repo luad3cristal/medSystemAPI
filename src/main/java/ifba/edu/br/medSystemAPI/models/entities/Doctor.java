@@ -28,7 +28,7 @@ public class Doctor {
   private String crm;
 
   @Enumerated(EnumType.STRING)
-  private Specialty specialty;
+  private Specialty Specialty;
 
   @ManyToOne
   @JoinColumn(name = "address_id")
@@ -38,12 +38,12 @@ public class Doctor {
 
   public Doctor () {}
 
-  public Doctor (String name, String email, String phone, String crm, Specialty specialty, Address address) {
+  public Doctor (String name, String email, String phone, String crm, Specialty Specialty, Address address) {
     this.name = name;
     this.email = email;
     this.phone = phone;
     this.crm = crm;
-    this.specialty = specialty;
+    this.Specialty = Specialty;
     this.address = address;
   }
 
@@ -62,8 +62,8 @@ public class Doctor {
   public String getCRM() { return crm; }
   public void setCRM(String crm) { this.crm = crm; }
 
-  public Specialty getSpecialty() { return specialty; }
-  public void setSpecialty(Specialty specialty) { this.specialty = specialty; }
+  public Specialty getSpecialty() { return Specialty; }
+  public void setSpecialty(Specialty Specialty) { this.Specialty = Specialty; }
 
   public Address getAddress() { return address; }
   public void setAddress(Address address) { this.address = address; }

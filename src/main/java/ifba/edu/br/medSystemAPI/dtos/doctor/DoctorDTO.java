@@ -8,7 +8,7 @@ public record DoctorDTO(
   String name, 
   String email, 
   String crm, 
-  Specialty specialty
+  Specialty Specialty
 ) {
   
   public DoctorDTO (Doctor doctor) {
