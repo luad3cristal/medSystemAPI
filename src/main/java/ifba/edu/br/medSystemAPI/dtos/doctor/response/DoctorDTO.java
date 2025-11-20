@@ -1,4 +1,4 @@
-package ifba.edu.br.medSystemAPI.dtos.doctor;
+package ifba.edu.br.medSystemAPI.dtos.doctor.response;
 
 import ifba.edu.br.medSystemAPI.models.entities.Doctor;
 import ifba.edu.br.medSystemAPI.models.enums.Specialty;

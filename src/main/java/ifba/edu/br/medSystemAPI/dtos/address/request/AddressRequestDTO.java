@@ -1,10 +1,10 @@
-package ifba.edu.br.medSystemAPI.dtos.address;
+package ifba.edu.br.medSystemAPI.dtos.address.request;
 
 import ifba.edu.br.medSystemAPI.models.entities.Address;
 import jakarta.validation.constraints.NotBlank;
 
 
-public record AddressFormDTO(
+public record AddressRequestDTO(
   @NotBlank(message= "Street is required")
   String street, 
   
@@ -24,7 +24,7 @@ public record AddressFormDTO(
   @NotBlank(message= "ZipCode is required")
   String zipCode
 ) {
-  public AddressFormDTO (Address address) {
+  public AddressRequestDTO (Address address) {
     this(
       address.getStreet(), 
       address.getNumber(),

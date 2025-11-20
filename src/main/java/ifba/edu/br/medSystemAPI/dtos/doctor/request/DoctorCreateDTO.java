@@ -1,12 +1,12 @@
-package ifba.edu.br.medSystemAPI.dtos.doctor;
+package ifba.edu.br.medSystemAPI.dtos.doctor.request;
 
-import ifba.edu.br.medSystemAPI.dtos.address.AddressFormDTO;
+import ifba.edu.br.medSystemAPI.dtos.address.request.AddressRequestDTO;
 import ifba.edu.br.medSystemAPI.models.entities.Doctor;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 
-public record DoctorFormDTO(
+public record DoctorCreateDTO(
   @NotBlank(message= "Name is required")
   String name, 
 
@@ -25,17 +25,17 @@ public record DoctorFormDTO(
   String specialty,
 
   @NotNull(message= "Address is required")
-  AddressFormDTO address
+  AddressRequestDTO address
 ) {
   
-  public DoctorFormDTO (Doctor doctor) {
+  public DoctorCreateDTO (Doctor doctor) {
     this(
       doctor.getName(), 
       doctor.getEmail(), 
       doctor.getPhone(),
       doctor.getCRM(), 
       doctor.getSpecialty().name(), 
-      new AddressFormDTO(doctor.getAddress())
+      new AddressRequestDTO(doctor.getAddress())
     );
   }
 

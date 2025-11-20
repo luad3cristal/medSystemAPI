@@ -1,6 +1,6 @@
-package ifba.edu.br.medSystemAPI.dtos.patient;
+package ifba.edu.br.medSystemAPI.dtos.patient.request;
 
-import ifba.edu.br.medSystemAPI.dtos.address.AddressFormDTO;
+import ifba.edu.br.medSystemAPI.dtos.address.request.AddressRequestDTO;
 import ifba.edu.br.medSystemAPI.models.entities.Patient;
 
 import jakarta.validation.constraints.Email;
@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.br.CPF;
 
-public record PatientFormDTO(
+public record PatientCreateDTO(
   @NotBlank(message= "Name is required")
   String name, 
 
@@ -24,16 +24,16 @@ public record PatientFormDTO(
   String cpf,
 
   @NotNull(message= "Address is required")
-  AddressFormDTO address
+  AddressRequestDTO address
 ) {
   
-  public PatientFormDTO (Patient patient) {
+  public PatientCreateDTO (Patient patient) {
     this(
       patient.getName(), 
       patient.getEmail(),
       patient.getPhone(),
       patient.getCPF(),
-      new AddressFormDTO(patient.getAddress())
+      new AddressRequestDTO(patient.getAddress())
     );
   }
 

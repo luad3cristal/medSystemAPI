@@ -1,4 +1,4 @@
-package ifba.edu.br.medSystemAPI.dtos.patient;
+package ifba.edu.br.medSystemAPI.dtos.patient.response;
 
 import ifba.edu.br.medSystemAPI.models.entities.Patient;
 

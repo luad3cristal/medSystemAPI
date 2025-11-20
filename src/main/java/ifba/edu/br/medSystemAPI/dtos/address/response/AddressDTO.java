@@ -1,4 +1,4 @@
-package ifba.edu.br.medSystemAPI.dtos.address;
+package ifba.edu.br.medSystemAPI.dtos.address.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import ifba.edu.br.medSystemAPI.models.entities.Address;
