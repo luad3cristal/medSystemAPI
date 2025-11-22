@@ -7,11 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import ifba.edu.br.medSystemAPI.repositories.DoctorRepository;
+import ifba.edu.br.medSystemAPI.dtos.address.request.AddressRequestDTO;
 import ifba.edu.br.medSystemAPI.dtos.doctor.request.DoctorCreateDTO;
 import ifba.edu.br.medSystemAPI.dtos.doctor.request.DoctorUpdateDTO;
 import ifba.edu.br.medSystemAPI.dtos.doctor.response.DoctorDTO;
 import ifba.edu.br.medSystemAPI.models.entities.Address;
 import ifba.edu.br.medSystemAPI.models.entities.Doctor;
+import ifba.edu.br.medSystemAPI.models.enums.Specialty;
 
 @Service
 public class DoctorService {
@@ -25,41 +27,68 @@ public class DoctorService {
     // TODO: Tratar DataIntegrityViolationException para CRM/Email duplicado
     // TODO: Tratar IllegalArgumentException para specialty inválida (do construtor Doctor)
     // TODO: Tratar ConstraintViolationException para validações JPA
-    var newDoctor = this.doctorRepository.save(new Doctor(doctor));
-    return new DoctorDTO(newDoctor);
+    Specialty doctorSpecialty = Specialty.valueOf(doctor.specialty().toUpperCase().trim());
+    Address doctorAddress = new Address(doctor.address());
+    Doctor newDoctor = new Doctor.Builder().name(doctor.name()).email(doctor.email()).phone(doctor.phone()).crm(doctor.crm()).specialty(doctorSpecialty).address(doctorAddress).build();
+    
+    return new DoctorDTO(this.doctorRepository.save(newDoctor));
   }
 
   public Page<DoctorDTO> listActiveDoctors(Pageable pageable) {
-    return this.doctorRepository.findAllActive(pageable, true).map(DoctorDTO::new);
+    return this.doctorRepository.findByStatus(pageable, true).map(DoctorDTO::new);
+  }
+
+  public Page<DoctorDTO> listAllDoctor(Pageable pageable) {
+    return this.doctorRepository.findAll(pageable).map(DoctorDTO::new);
+  }
+
+  public void updateDoctorAddress (Doctor doctor, AddressRequestDTO address) {
+    Address existingAddress = doctor.getAddress();
+
+    if (existingAddress != null) {
+      existingAddress.setStreet(address.street());
+      existingAddress.setNumber(address.number());
+      existingAddress.setComplement(address.complement());
+      existingAddress.setNeighborhood(address.neighborhood());
+      existingAddress.setCity(address.city());
+      existingAddress.setState(address.state());
+      existingAddress.setZipCode(address.zipCode());
+    }
+    else {
+      doctor.setAddress(new Address(address));
+    }
   }
 
   public DoctorDTO updateDoctor(Long id, DoctorUpdateDTO doctor) {
     // TODO: Tratar EntityNotFoundException quando médico não for encontrado
     // TODO: Validar se médico está ativo antes de atualizar
-    Doctor checkDoctor = this.doctorRepository.findById(id).orElse(null);
+    Doctor existingDoctor = this.doctorRepository.findById(id).orElse(null);
 
-    if (checkDoctor != null) {
-      checkDoctor.setName(doctor.name());
-      checkDoctor.setPhone(doctor.phone());
-      // TODO: Tratar NullPointerException no construtor Address
-      checkDoctor.setAddress(new Address(doctor.address()));
-      // TODO: Tratar ConstraintViolationException para validações JPA
-      this.doctorRepository.save(checkDoctor);
+    if (existingDoctor != null) {
+      existingDoctor.setName(doctor.name());
+      existingDoctor.setPhone(doctor.phone());
+      updateDoctorAddress(existingDoctor, doctor.address());
+
+      return new DoctorDTO(this.doctorRepository.save(existingDoctor));
     }
-
-    // TODO: Tratar NullPointerException se checkDoctor for null
-    return new DoctorDTO(checkDoctor);
+    // TODO: Melhor usar orElseThrow() em vez de retornar null
+    return null;
   }
 
-  public void deactiveDoctorAccount (Long id) {
+  public DoctorDTO deactiveDoctorAccount (Long id) {
     // TODO: Tratar EntityNotFoundException quando médico não for encontrado
-    // TODO: Implementar soft delete (status = false) em vez de delete físico
     // TODO: Validar se médico pode ser desativado (ex: não tem consultas agendadas)
-    Optional<Doctor> checkDoctor = this.doctorRepository.findById(id);
-    if (checkDoctor.isPresent()) {
-      // TODO: Tratar EmptyResultDataAccessException se ID não existir
-      this.doctorRepository.deleteById(id);
+    Optional<Doctor> doctorOp = this.doctorRepository.findById(id);
+    if (doctorOp.isPresent()) {
+      Doctor doctor = doctorOp.get();
+      doctor.setStatus(false);
+      this.doctorRepository.save(doctor);
+
+      return new DoctorDTO(doctor);
     }
+    
+    // TODO: Melhor usar orElseThrow() em vez de retornar null
+    return null;
   }
 
 }
