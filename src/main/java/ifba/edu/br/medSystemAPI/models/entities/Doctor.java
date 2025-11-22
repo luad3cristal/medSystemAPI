@@ -1,5 +1,6 @@
 package ifba.edu.br.medSystemAPI.models.entities;
 
+import ifba.edu.br.medSystemAPI.dtos.doctor.request.DoctorCreateDTO;
 import ifba.edu.br.medSystemAPI.models.enums.Specialty;
 
 import jakarta.persistence.Column;
@@ -28,7 +29,7 @@ public class Doctor {
   private String crm;
 
   @Enumerated(EnumType.STRING)
-  private Specialty Specialty;
+  private Specialty specialty;
 
   @ManyToOne
   @JoinColumn(name = "address_id")
@@ -38,13 +39,22 @@ public class Doctor {
 
   public Doctor () {}
 
-  public Doctor (String name, String email, String phone, String crm, Specialty Specialty, Address address) {
+  public Doctor (String name, String email, String phone, String crm, Specialty specialty, Address address) {
     this.name = name;
     this.email = email;
     this.phone = phone;
     this.crm = crm;
-    this.Specialty = Specialty;
+    this.specialty = specialty;
     this.address = address;
+  }
+
+  public Doctor (DoctorCreateDTO doctor) {
+    this.name = doctor.name();
+    this.email = doctor.email();
+    this.phone = doctor.phone();
+    this.crm = doctor.crm();
+    this.specialty = Specialty.valueOf(doctor.specialty().toUpperCase().trim());
+    this.address = new Address(doctor.address());
   }
 
   public Long getId() { return id; }
@@ -62,8 +72,8 @@ public class Doctor {
   public String getCRM() { return crm; }
   public void setCRM(String crm) { this.crm = crm; }
 
-  public Specialty getSpecialty() { return Specialty; }
-  public void setSpecialty(Specialty Specialty) { this.Specialty = Specialty; }
+  public Specialty getSpecialty() { return specialty; }
+  public void setSpecialty(Specialty specialty) { this.specialty = specialty; }
 
   public Address getAddress() { return address; }
   public void setAddress(Address address) { this.address = address; }

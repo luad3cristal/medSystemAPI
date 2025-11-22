@@ -1,5 +1,6 @@
 package ifba.edu.br.medSystemAPI.models.entities;
 
+import ifba.edu.br.medSystemAPI.dtos.patient.request.PatientCreateDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +38,14 @@ public class Patient {
     this.phone = phone;
     this.cpf = cpf;
     this.address = address;
+  }
+
+  public Patient (PatientCreateDTO patient) {
+    this.name = patient.name();
+    this.email = patient.email();
+    this.phone = patient.phone();
+    this.cpf = patient.cpf();
+    this.address = new Address(patient.address());
   }
 
   public Long getId() { return id; }

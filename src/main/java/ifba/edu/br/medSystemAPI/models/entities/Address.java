@@ -1,5 +1,6 @@
 package ifba.edu.br.medSystemAPI.models.entities;
 
+import ifba.edu.br.medSystemAPI.dtos.address.request.AddressRequestDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,6 +33,16 @@ public class Address {
     this.city = city;
     this.state = state;
     this.zipCode = zipCode;
+  }
+
+  public Address(AddressRequestDTO address) {
+    this.street = address.street();
+    this.number = address.number();
+    this.complement = address.complement();
+    this.neighborhood = address.neighborhood();
+    this.city = address.city();
+    this.state = address.state();
+    this.zipCode = address.zipCode();
   }
 
   public Long getId() { return id; }
