@@ -34,6 +34,7 @@ public record DoctorCreateDTO(
       doctor.getEmail(), 
       doctor.getPhone(),
       doctor.getCRM(), 
+      // TODO: Tratar NullPointerException se getSpecialty() for null
       doctor.getSpecialty().name(), 
       new AddressRequestDTO(doctor.getAddress())
     );

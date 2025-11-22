@@ -36,6 +36,7 @@ public class Address {
   }
 
   public Address(AddressRequestDTO address) {
+    // TODO: Tratar NullPointerException se address for null
     this.street = address.street();
     this.number = address.number();
     this.complement = address.complement();

@@ -49,11 +49,14 @@ public class Doctor {
   }
 
   public Doctor (DoctorCreateDTO doctor) {
+    // TODO: Tratar NullPointerException se doctor.specialty() for null
+    // TODO: Tratar IllegalArgumentException se specialty não existir no enum
     this.name = doctor.name();
     this.email = doctor.email();
     this.phone = doctor.phone();
     this.crm = doctor.crm();
     this.specialty = Specialty.valueOf(doctor.specialty().toUpperCase().trim());
+    // TODO: Tratar NullPointerException se doctor.address() for null
     this.address = new Address(doctor.address());
   }
 

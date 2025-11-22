@@ -17,6 +17,7 @@ public record DoctorDTO(
       doctor.getName(), 
       doctor.getEmail(),
       doctor.getCRM(),
+      // TODO: Tratar NullPointerException se getSpecialty() for null
       doctor.getSpecialty()
     );
   }

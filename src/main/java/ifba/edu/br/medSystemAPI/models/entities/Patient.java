@@ -41,6 +41,7 @@ public class Patient {
   }
 
   public Patient (PatientCreateDTO patient) {
+    // TODO: Tratar NullPointerException se patient.address() for null
     this.name = patient.name();
     this.email = patient.email();
     this.phone = patient.phone();
