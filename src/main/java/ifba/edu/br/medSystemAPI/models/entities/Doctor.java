@@ -1,6 +1,5 @@
 package ifba.edu.br.medSystemAPI.models.entities;
 
-import ifba.edu.br.medSystemAPI.dtos.doctor.request.DoctorCreateDTO;
 import ifba.edu.br.medSystemAPI.models.enums.Specialty;
 
 import jakarta.persistence.Column;
@@ -48,16 +47,31 @@ public class Doctor {
     this.address = address;
   }
 
-  public Doctor (DoctorCreateDTO doctor) {
-    // TODO: Tratar NullPointerException se doctor.specialty() for null
-    // TODO: Tratar IllegalArgumentException se specialty não existir no enum
-    this.name = doctor.name();
-    this.email = doctor.email();
-    this.phone = doctor.phone();
-    this.crm = doctor.crm();
-    this.specialty = Specialty.valueOf(doctor.specialty().toUpperCase().trim());
-    // TODO: Tratar NullPointerException se doctor.address() for null
-    this.address = new Address(doctor.address());
+  public static class Builder {
+    private String name;
+    private String email;
+    private String phone;
+    private String crm;
+    private Specialty specialty;
+    private Address address;
+
+    public Builder name(String name) { this.name = name; return this; }
+    public Builder email(String email) { this.email = email; return this; }
+    public Builder phone(String phone) { this.phone = phone; return this; }
+    public Builder crm(String crm) { this.crm = crm; return this; }
+    public Builder specialty(Specialty specialty) { this.specialty = specialty; return this; }
+    public Builder address(Address address) { this.address = address; return this; }
+
+    public Doctor build() {
+        Doctor doctor = new Doctor();
+        doctor.setName(this.name);
+        doctor.setEmail(this.email);
+        doctor.setPhone(this.phone);
+        doctor.setCRM(this.crm);
+        doctor.setSpecialty(this.specialty);
+        doctor.setAddress(this.address);
+        return doctor;
+    }
   }
 
   public Long getId() { return id; }
