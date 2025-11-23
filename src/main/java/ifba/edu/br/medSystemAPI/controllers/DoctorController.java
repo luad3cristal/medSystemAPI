@@ -1,6 +1,6 @@
 package ifba.edu.br.medSystemAPI.controllers;
 
-import org.springframework.data.domain.Page;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,13 +28,13 @@ public class DoctorController {
   }
 
   @GetMapping
-  public Page<DoctorDTO> getActiveDoctors (@PageableDefault(size = 10, sort = "name") Pageable pageable) {
-    return doctorService.listActiveDoctors(pageable);
+  public List<DoctorDTO> getActiveDoctors (@PageableDefault(size = 10, sort = "name") Pageable pageable) {
+    return doctorService.listDoctorsByStatus(pageable, true).getContent();
   } 
 
   @GetMapping("/all")
-  public Page<DoctorDTO> getAllDoctors (@PageableDefault(size = 10, sort = "name") Pageable pageable) {
-    return doctorService.listAllDoctors(pageable);
+  public List<DoctorDTO> getAllDoctors (@PageableDefault(size = 10, sort = "name") Pageable pageable) {
+    return doctorService.listAllDoctors(pageable).getContent();
   } 
 
   @PostMapping
