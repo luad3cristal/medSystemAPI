@@ -1,6 +1,6 @@
 package ifba.edu.br.medSystemAPI.models.entities;
 
-import ifba.edu.br.medSystemAPI.dtos.patient.request.PatientCreateDTO;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,7 +24,7 @@ public class Patient {
   @Column(unique = true)
   private String cpf;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "address_id")
   private Address address;
 
@@ -40,13 +40,28 @@ public class Patient {
     this.address = address;
   }
 
-  public Patient (PatientCreateDTO patient) {
-    // TODO: Tratar NullPointerException se patient.address() for null
-    this.name = patient.name();
-    this.email = patient.email();
-    this.phone = patient.phone();
-    this.cpf = patient.cpf();
-    this.address = new Address(patient.address());
+  public static class Builder {
+    private String name;
+    private String email;
+    private String phone;
+    private String cpf;
+    private Address address;
+
+    public Builder name(String name) { this.name = name; return this; }
+    public Builder email(String email) { this.email = email; return this; }
+    public Builder phone(String phone) { this.phone = phone; return this; }
+    public Builder cpf(String cpf) { this.cpf = cpf; return this; }
+    public Builder address(Address address) { this.address = address; return this; }
+
+    public Patient build() {
+        Patient patient = new Patient();
+        patient.setName(this.name);
+        patient.setEmail(this.email);
+        patient.setPhone(this.phone);
+        patient.setCPF(this.cpf);
+        patient.setAddress(this.address);
+        return patient;
+    }
   }
 
   public Long getId() { return id; }
