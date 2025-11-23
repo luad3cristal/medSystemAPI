@@ -18,9 +18,11 @@ import ifba.edu.br.medSystemAPI.models.enums.Specialty;
 @Service
 public class DoctorService {
   private DoctorRepository doctorRepository;
+  private AddressService addressService;
 
-  public DoctorService (DoctorRepository doctorRepository) {
+  public DoctorService (DoctorRepository doctorRepository, AddressService addressService) {
     this.doctorRepository = doctorRepository;
+    this.addressService = addressService;
   }
 
   public DoctorDTO createDoctor (DoctorCreateDTO doctor) {
@@ -46,16 +48,10 @@ public class DoctorService {
     Address existingAddress = doctor.getAddress();
 
     if (existingAddress != null) {
-      existingAddress.setStreet(address.street());
-      existingAddress.setNumber(address.number());
-      existingAddress.setComplement(address.complement());
-      existingAddress.setNeighborhood(address.neighborhood());
-      existingAddress.setCity(address.city());
-      existingAddress.setState(address.state());
-      existingAddress.setZipCode(address.zipCode());
+      addressService.updateAddress(existingAddress, address);
     }
     else {
-      doctor.setAddress(new Address(address));
+      doctor.setAddress(addressService.createAddress(address));
     }
   }
 
