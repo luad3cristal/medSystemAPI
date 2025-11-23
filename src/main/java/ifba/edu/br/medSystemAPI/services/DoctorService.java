@@ -38,7 +38,7 @@ public class DoctorService {
     return this.doctorRepository.findByStatus(pageable, true).map(DoctorDTO::new);
   }
 
-  public Page<DoctorDTO> listAllDoctor(Pageable pageable) {
+  public Page<DoctorDTO> listAllDoctors(Pageable pageable) {
     return this.doctorRepository.findAll(pageable).map(DoctorDTO::new);
   }
 
