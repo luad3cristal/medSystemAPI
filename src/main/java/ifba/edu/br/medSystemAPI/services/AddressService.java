@@ -1,8 +1,11 @@
 package ifba.edu.br.medSystemAPI.services;
 
+import org.springframework.stereotype.Service;
+
 import ifba.edu.br.medSystemAPI.dtos.address.request.AddressRequestDTO;
 import ifba.edu.br.medSystemAPI.models.entities.Address;
 
+@Service
 public class AddressService {
   
   public void updateAddress(Address existingAddress, AddressRequestDTO address) {
