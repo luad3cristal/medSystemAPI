@@ -31,7 +31,7 @@ public class DoctorService {
     // TODO: Tratar ConstraintViolationException para validações JPA
     Specialty doctorSpecialty = Specialty.valueOf(doctor.specialty().toUpperCase().trim());
     Address doctorAddress = new Address(doctor.address());
-    Doctor newDoctor = new Doctor.Builder().name(doctor.name()).email(doctor.email()).phone(doctor.phone()).crm(doctor.crm()).specialty(doctorSpecialty).address(doctorAddress).build();
+    Doctor newDoctor = new Doctor(doctor.name(), doctor.email(), doctor.phone(), doctor.crm(), doctorSpecialty, doctorAddress);
     
     return new DoctorDTO(this.doctorRepository.save(newDoctor));
   }

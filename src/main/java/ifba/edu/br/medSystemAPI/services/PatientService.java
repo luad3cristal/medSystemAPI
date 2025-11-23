@@ -29,7 +29,7 @@ public class PatientService {
     // TODO: Tratar DataIntegrityViolationException para CPF/Email duplicado
     // TODO: Tratar ConstraintViolationException para validações JPA
     Address patientAddress = new Address(patient.address());
-    Patient newPatient = new Patient.Builder().name(patient.name()).email(patient.email()).phone(patient.phone()).cpf(patient.cpf()).address(patientAddress).build();
+    Patient newPatient = new Patient(patient.name(), patient.email(), patient.phone(), patient.cpf(), patientAddress);
 
     return new PatientDTO(this.patientRepository.save(newPatient));
   }
