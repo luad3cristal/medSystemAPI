@@ -20,7 +20,6 @@ public record DoctorCreateDTO(
   @NotBlank(message= "CRM is required")
   String crm,
 
-  // Permitir a transformação para Specialty ou converter no construtor da entidade...
   @NotBlank(message= "Specialty is required")
   String specialty,
 
