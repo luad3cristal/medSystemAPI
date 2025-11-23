@@ -1,7 +1,7 @@
 package ifba.edu.br.medSystemAPI.models.entities;
 
 import ifba.edu.br.medSystemAPI.models.enums.Specialty;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,7 +30,7 @@ public class Doctor {
   @Enumerated(EnumType.STRING)
   private Specialty specialty;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "address_id")
   private Address address;
 
