@@ -10,6 +10,7 @@ public record PatientDTO(
 ) {
   
   public PatientDTO (Patient patient) {
+    // TODO: Tratar NullPointerException se patient for null
     this(
       patient.getId(), 
       patient.getName(), 
