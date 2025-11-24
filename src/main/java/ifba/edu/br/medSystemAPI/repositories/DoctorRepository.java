@@ -12,8 +12,7 @@ import org.springframework.data.repository.query.Param;
 import ifba.edu.br.medSystemAPI.models.entities.Doctor;
 
 public interface DoctorRepository extends JpaRepository <Doctor, Long> {
-    @Query("SELECT d from Doctor d WHERE d.status = :status")
-    Page<Doctor> findByStatus(Pageable pageable, @Param("status") Boolean status);
+    Page<Doctor> findByStatus(Pageable pageable, Boolean status);
 
     @Query(
         "SELECT d from Doctor d WHERE d.id NOT IN" +
