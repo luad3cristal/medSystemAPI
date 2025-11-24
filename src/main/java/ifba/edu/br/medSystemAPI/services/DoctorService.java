@@ -1,19 +1,22 @@
 package ifba.edu.br.medSystemAPI.services;
 
-import java.util.Optional;
-
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import ifba.edu.br.medSystemAPI.repositories.DoctorRepository;
 import ifba.edu.br.medSystemAPI.dtos.address.request.AddressRequestDTO;
 import ifba.edu.br.medSystemAPI.dtos.doctor.request.DoctorCreateDTO;
 import ifba.edu.br.medSystemAPI.dtos.doctor.request.DoctorUpdateDTO;
 import ifba.edu.br.medSystemAPI.dtos.doctor.response.DoctorDTO;
+import ifba.edu.br.medSystemAPI.exceptions.doctor.DoctorNotFoundException;
+import ifba.edu.br.medSystemAPI.exceptions.doctor.DuplicateDoctorException;
+import ifba.edu.br.medSystemAPI.exceptions.doctor.InvalidSpecialtyException;
 import ifba.edu.br.medSystemAPI.models.entities.Address;
 import ifba.edu.br.medSystemAPI.models.entities.Doctor;
 import ifba.edu.br.medSystemAPI.models.enums.Specialty;
+import ifba.edu.br.medSystemAPI.repositories.DoctorRepository;
+import jakarta.validation.ConstraintViolationException;
 
 @Service
 public class DoctorService {
@@ -26,14 +29,35 @@ public class DoctorService {
   }
 
   public DoctorDTO createDoctor (DoctorCreateDTO doctor) {
-    // TODO: Tratar DataIntegrityViolationException para CRM/Email duplicado
-    // TODO: Tratar IllegalArgumentException para specialty inválida (do construtor Doctor)
-    // TODO: Tratar ConstraintViolationException para validações JPA
-    Specialty doctorSpecialty = Specialty.valueOf(doctor.specialty().toUpperCase().trim());
-    Address doctorAddress = new Address(doctor.address());
-    Doctor newDoctor = new Doctor(doctor.name(), doctor.email(), doctor.phone(), doctor.crm(), doctorSpecialty, doctorAddress);
+    try {
+      Specialty doctorSpecialty;
+      try {
+        doctorSpecialty =  Specialty.valueOf(doctor.specialty().toUpperCase().trim());
+      } catch (IllegalArgumentException exception) {
+        throw new InvalidSpecialtyException(doctor.specialty());
+      }
+
+      Address doctorAddress = new Address(doctor.address());
+
+      Doctor newDoctor = new Doctor(doctor.name(), doctor.email(), doctor.phone(), doctor.crm(), doctorSpecialty, doctorAddress);
+      
+      Doctor savedDoctor = doctorRepository.save(newDoctor);
+
+      return new DoctorDTO(savedDoctor);
+    } catch (DataIntegrityViolationException exception) {
+      String message = exception.getMessage().toLowerCase();
+      
+      if(message.contains("crm")) {
+        throw new DuplicateDoctorException("CRM", doctor.crm());
+      }
+      else if (message.contains("email")) {
+        throw new DuplicateDoctorException("email", doctor.email());
+      }
+      throw exception;
     
-    return new DoctorDTO(this.doctorRepository.save(newDoctor));
+    } catch (ConstraintViolationException exception) {
+      throw exception;
+    }
   }
 
   public Page<DoctorDTO> listDoctorsByStatus(Pageable pageable, Boolean status) {
@@ -56,35 +80,25 @@ public class DoctorService {
   }
 
   public DoctorDTO updateDoctor(Long id, DoctorUpdateDTO doctor) {
-    // TODO: Tratar EntityNotFoundException quando médico não for encontrado
-    // TODO: Validar se médico está ativo antes de atualizar
-    Doctor existingDoctor = this.doctorRepository.findById(id).orElse(null);
+    Doctor existingDoctor = this.doctorRepository.findById(id).orElseThrow(() -> new DoctorNotFoundException(id));
 
-    if (existingDoctor != null) {
+    if (existingDoctor.getStatus()) {
       existingDoctor.setName(doctor.name());
       existingDoctor.setPhone(doctor.phone());
       updateDoctorAddress(existingDoctor, doctor.address());
 
       return new DoctorDTO(this.doctorRepository.save(existingDoctor));
     }
-    // TODO: Melhor usar orElseThrow() em vez de retornar null
+    
     return null;
   }
 
   public DoctorDTO deactiveDoctorAccount (Long id) {
-    // TODO: Tratar EntityNotFoundException quando médico não for encontrado
-    // TODO: Validar se médico pode ser desativado (ex: não tem consultas agendadas)
-    Optional<Doctor> doctorOp = this.doctorRepository.findById(id);
-    if (doctorOp.isPresent()) {
-      Doctor doctor = doctorOp.get();
-      doctor.setStatus(false);
-      this.doctorRepository.save(doctor);
+    Doctor doctor = this.doctorRepository.findById(id).orElseThrow(() -> new DoctorNotFoundException(id));
+    doctor.setStatus(false);
+    this.doctorRepository.save(doctor);
 
-      return new DoctorDTO(doctor);
-    }
-    
-    // TODO: Melhor usar orElseThrow() em vez de retornar null
-    return null;
+    return new DoctorDTO(doctor);
   }
 
 }
