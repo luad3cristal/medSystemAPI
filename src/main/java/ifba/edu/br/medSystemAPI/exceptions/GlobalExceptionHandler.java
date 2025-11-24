@@ -6,6 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import ifba.edu.br.medSystemAPI.exceptions.appointment.AppointmentCannotBeCancelledException;
+import ifba.edu.br.medSystemAPI.exceptions.appointment.AppointmentNotFoundException;
+import ifba.edu.br.medSystemAPI.exceptions.appointment.DoctorNotAvailableException;
+import ifba.edu.br.medSystemAPI.exceptions.appointment.InvalidAppointmentTimeException;
+import ifba.edu.br.medSystemAPI.exceptions.appointment.PatientAlreadyHasAppointmentException;
 import ifba.edu.br.medSystemAPI.exceptions.doctor.DoctorNotFoundException;
 import ifba.edu.br.medSystemAPI.exceptions.doctor.DuplicateDoctorException;
 import ifba.edu.br.medSystemAPI.exceptions.patient.DuplicatePatientException;
@@ -47,4 +52,31 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleDuplicatePatient(DuplicatePatientException ex) {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
   }
+
+  // appointment exceptions
+  @ExceptionHandler(AppointmentNotFoundException.class)
+  public ResponseEntity<String> handleAppointmentNotFound(AppointmentNotFoundException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+  }
+
+  @ExceptionHandler(InvalidAppointmentTimeException.class)
+  public ResponseEntity<String> handleInvalidAppointmentTime(InvalidAppointmentTimeException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+  }
+
+  @ExceptionHandler(DoctorNotAvailableException.class)
+  public ResponseEntity<String> handleDoctorNotAvailable(DoctorNotAvailableException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+  }
+
+  @ExceptionHandler(PatientAlreadyHasAppointmentException.class)
+  public ResponseEntity<String> handlePatientAlreadyHasAppointment(PatientAlreadyHasAppointmentException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+  }
+
+  @ExceptionHandler(AppointmentCannotBeCancelledException.class)
+  public ResponseEntity<String> handleAppointmentCannotBeCancelled(AppointmentCannotBeCancelledException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+  }
+  
 }
