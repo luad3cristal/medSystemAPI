@@ -42,23 +42,16 @@ public class PatientController {
 
   @PostMapping
   public PatientDTO createPatient(@RequestBody @Valid PatientCreateDTO patient) {
-    // TODO: Tratar DataIntegrityViolationException para CPF/Email duplicado
-    // TODO: Considerar usar ResponseEntity<PatientDTO> com status 201 CREATED
     return patientService.createPatient(patient);
   }
 
   @PutMapping("/{id}") 
   public PatientDTO updatePatient(@PathVariable Long id, @RequestBody @Valid PatientUpdateDTO patient) {
-    // TODO: Tratar EntityNotFoundException quando paciente não for encontrado
-    // TODO: Validar se ID é válido (não negativo/zero)
     return patientService.updatePatient(id, patient);
   }
 
   @DeleteMapping("/{id}") 
   public PatientDTO deactivePatientAccount(@PathVariable Long id) {
-    // TODO: Tratar EntityNotFoundException quando paciente não for encontrado
-    // TODO: Validar se ID é válido (não negativo/zero)
-    // TODO: Considerar usar ResponseEntity<PatientDTO> com status 204 NO CONTENT
     return patientService.deactivePatientAccount(id);
   }
 
