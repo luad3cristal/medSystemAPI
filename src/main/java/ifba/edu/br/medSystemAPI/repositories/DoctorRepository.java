@@ -15,9 +15,9 @@ public interface DoctorRepository extends JpaRepository <Doctor, Long> {
     Page<Doctor> findByStatus(Pageable pageable, Boolean status);
 
     @Query(
-        "SELECT d from Doctor d WHERE d.id NOT IN" +
-        "(SELECT a.doctor.id FROM Appointment a)" +
-        "WHERE a.appointmentTime = :appointmentTime AND a.status = 'SCHEDULED')"
+        "SELECT d from Doctor d WHERE d.id NOT IN " +
+        "(SELECT a.doctor.id FROM Appointment a " +
+        "WHERE a.appointmentTime = :appointmentTime AND a.status = ifba.edu.br.medSystemAPI.models.enums.AppointmentStatus.SCHEDULED)"
     )
     List<Doctor> findAvailableDoctorsAtAppointmentTime(@Param("appointmentTime") LocalDateTime appointmentTime);
 }

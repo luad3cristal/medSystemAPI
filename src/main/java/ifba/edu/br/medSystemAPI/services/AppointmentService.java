@@ -183,8 +183,8 @@ public class AppointmentService {
     return new AppointmentDTO(this.appointmentRepository.save(newAppointment));
   }
 
-  public AppointmentDTO cancelAppointment (AppointmentCancelDTO appointment) {
-    Appointment existingAppointment = appointmentRepository.findById(appointment.appointmentId()).orElseThrow(() -> new AppointmentNotFoundException(appointment.appointmentId()));
+  public AppointmentDTO cancelAppointment (Long id, AppointmentCancelDTO appointment) {
+    Appointment existingAppointment = appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id));
 
     validateCancellationRules(existingAppointment);
 
