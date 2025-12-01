@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,9 +53,10 @@ public class AppointmentService {
     if (allDoctors.isEmpty()) {
       throw new DoctorNotAvailableException("No doctors available at " + appointmentTime);
     }
-
-    Collections.shuffle(allDoctors);
-    return allDoctors.get(0);
+    
+    List<Doctor> doctorsList = new ArrayList<>(allDoctors);
+    Collections.shuffle(doctorsList);
+    return doctorsList.get(0);
   }
 
 
@@ -170,10 +172,11 @@ public class AppointmentService {
   public AppointmentDTO scheduleAppointment (AppointmentCreateDTO appointment) {
     Patient patientInfo = this.patientRepository.findById(appointment.patientId()).orElseThrow(() -> new PatientNotFoundException(appointment.patientId()));
 
-    Doctor doctorInfo = this.doctorRepository.findById(appointment.doctorId()).orElse(null);
-
-    if (doctorInfo == null) {
+    Doctor doctorInfo;
+    if (appointment.doctorId() == null) {
       doctorInfo = selectRandomDoctor(appointment.appointmentTime());
+    } else {
+      doctorInfo = this.doctorRepository.findById(appointment.doctorId()).orElseThrow(() -> new DoctorNotAvailableException("Doctor not found with ID: " + appointment.doctorId()));
     }
 
     validateSchedulingRules(patientInfo, doctorInfo, appointment.appointmentTime());
