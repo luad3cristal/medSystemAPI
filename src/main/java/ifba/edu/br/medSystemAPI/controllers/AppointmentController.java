@@ -1,7 +1,8 @@
 package ifba.edu.br.medSystemAPI.controllers;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,8 +27,8 @@ public class AppointmentController {
   }
 
   @GetMapping
-  public List<AppointmentDTO> getAppointments() {
-    return appointmentService.getAllAppointment();
+  public Page<AppointmentDTO> getAppointments(@PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable) {
+    return appointmentService.getAllAppointment(pageable);
   }
 
   @GetMapping("/{id}")

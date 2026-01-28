@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import ifba.edu.br.medSystemAPI.dtos.appointment.request.AppointmentCancelDTO;
@@ -163,8 +165,8 @@ public class AppointmentService {
     return new AppointmentDTO(this.appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id)));
   }
 
-  public List<AppointmentDTO> getAllAppointment () {
-    return this.appointmentRepository.findAll().stream().map(AppointmentDTO::new).toList();
+  public Page<AppointmentDTO> getAllAppointment (Pageable pageable) {
+    return this.appointmentRepository.findAll(pageable).map(AppointmentDTO::new);
   }
   
   public AppointmentDTO scheduleAppointment (AppointmentCreateDTO appointment) {
