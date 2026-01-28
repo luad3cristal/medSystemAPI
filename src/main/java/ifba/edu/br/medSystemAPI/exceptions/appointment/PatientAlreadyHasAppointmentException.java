@@ -2,10 +2,12 @@ package ifba.edu.br.medSystemAPI.exceptions.appointment;
 
 import java.time.LocalDate;
 
+import ifba.edu.br.medSystemAPI.models.entities.Patient;
+
 public class PatientAlreadyHasAppointmentException extends RuntimeException {
-  public PatientAlreadyHasAppointmentException(Long patientId, LocalDate date) {
+  public PatientAlreadyHasAppointmentException(Patient patient, LocalDate date) {
     //TODO: passar o nome ao invés do id
-    super("Patient with id " + patientId + " already has an appointment on " + date);
+    super("Patient " + patient.getName() + "(CPF: " + patient.getCPF() + ") already has an appointment on " + date);
   }
   
   public PatientAlreadyHasAppointmentException(String message) {

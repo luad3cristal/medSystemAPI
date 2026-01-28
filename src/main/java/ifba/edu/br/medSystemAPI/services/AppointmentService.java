@@ -135,7 +135,7 @@ public class AppointmentService {
     }
 
     if (isDoctorBusy(doctor, appointmentTime)) {
-      throw new DoctorNotAvailableException(doctor.getId(), appointmentTime);
+      throw new DoctorNotAvailableException(doctor, appointmentTime);
     }
 
     if (!isDoctorAvailableForOneHour(doctor, appointmentTime)) {
@@ -143,7 +143,7 @@ public class AppointmentService {
     }
 
     if (hasAppointmentSameDay(patient, appointmentTime)) {
-      throw new PatientAlreadyHasAppointmentException(patient.getId(), appointmentTime.toLocalDate());
+      throw new PatientAlreadyHasAppointmentException(patient, appointmentTime.toLocalDate());
     }
 
   }
