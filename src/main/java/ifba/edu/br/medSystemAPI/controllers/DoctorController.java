@@ -3,6 +3,8 @@ package ifba.edu.br.medSystemAPI.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,28 +30,34 @@ public class DoctorController {
   }
 
   @GetMapping
-  public Page<DoctorDTO> getActiveDoctors (@PageableDefault(size = 10, sort = "name") Pageable pageable) {
-    return doctorService.listDoctorsByStatus(pageable, true);
+  public ResponseEntity<Page<DoctorDTO>> getActiveDoctors (@PageableDefault(size = 10, sort = "name") Pageable pageable) {
+    return ResponseEntity.status(HttpStatus.OK)
+    .body(doctorService.listDoctorsByStatus(pageable, true));
   } 
 
   @GetMapping("/all")
-  public Page<DoctorDTO> getAllDoctors (@PageableDefault(size = 10, sort = "name") Pageable pageable) {
-    return doctorService.listAllDoctors(pageable);
+  public ResponseEntity<Page<DoctorDTO>> getAllDoctors (@PageableDefault(size = 10, sort = "name") Pageable pageable) {
+    return ResponseEntity.status(HttpStatus.OK)
+    .body(doctorService.listAllDoctors(pageable)) ;
   } 
 
   @PostMapping
-  public DoctorDTO createDoctor(@RequestBody @Valid DoctorCreateDTO doctor) {
-    return doctorService.createDoctor(doctor);
+  public ResponseEntity<DoctorDTO> createDoctor(@RequestBody @Valid DoctorCreateDTO doctor) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+    .body(doctorService.createDoctor(doctor))
+    ;
   }
 
   @PutMapping("/{id}") 
-  public DoctorDTO updateDoctor(@PathVariable Long id, @RequestBody @Valid DoctorUpdateDTO doctor) {
-    return doctorService.updateDoctor(id, doctor);
+  public ResponseEntity<DoctorDTO> updateDoctor(@PathVariable Long id, @RequestBody @Valid DoctorUpdateDTO doctor) {
+    return ResponseEntity.status(HttpStatus.OK)
+    .body(doctorService.updateDoctor(id, doctor));
   }
 
   @DeleteMapping("/{id}") 
-  public DoctorDTO deactiveDoctorAccount(@PathVariable Long id) {
-    return doctorService.deactiveDoctorAccount(id);
+  public ResponseEntity<DoctorDTO> deactiveDoctorAccount(@PathVariable Long id) {
+    return ResponseEntity.status(HttpStatus.OK)
+    .body(doctorService.deactiveDoctorAccount(id));
   }
 
 }

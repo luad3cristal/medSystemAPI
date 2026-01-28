@@ -3,6 +3,8 @@ package ifba.edu.br.medSystemAPI.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,23 +29,27 @@ public class AppointmentController {
   }
 
   @GetMapping
-  public Page<AppointmentDTO> getAppointments(@PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable) {
-    return appointmentService.getAllAppointment(pageable);
+  public ResponseEntity<Page<AppointmentDTO>> getAppointments(@PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable) {
+    return ResponseEntity.status(HttpStatus.OK)
+    .body(appointmentService.getAllAppointments(pageable));
   }
 
   @GetMapping("/{id}")
-  public AppointmentDTO getAppointmentById (@PathVariable Long id) {
-    return appointmentService.getAppointmentById(id);
+  public ResponseEntity<AppointmentDTO> getAppointmentById (@PathVariable Long id) {
+    return ResponseEntity.status(HttpStatus.OK)
+    .body(appointmentService.getAppointmentById(id));
   }
 
   @PostMapping()
-  public AppointmentDTO scheduleAppointment(@RequestBody @Valid AppointmentCreateDTO appointment) {
-    return appointmentService.scheduleAppointment(appointment);
+  public ResponseEntity<AppointmentDTO> scheduleAppointment(@RequestBody @Valid AppointmentCreateDTO appointment) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+    .body(appointmentService.scheduleAppointment(appointment));
   }
 
   @DeleteMapping("/{id}")
-  public AppointmentDTO cancelAppointment(@PathVariable Long id, @RequestBody @Valid AppointmentCancelDTO appointment) {
-    return appointmentService.cancelAppointment(id, appointment);
+  public ResponseEntity<AppointmentDTO> cancelAppointment(@PathVariable Long id, @RequestBody @Valid AppointmentCancelDTO appointment) {
+    return ResponseEntity.status(HttpStatus.OK)
+    .body(appointmentService.cancelAppointment(id, appointment));
   }
   
 }
