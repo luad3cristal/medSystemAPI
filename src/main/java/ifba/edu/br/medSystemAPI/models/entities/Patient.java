@@ -18,10 +18,11 @@ public class Patient {
   private Long id;
 
   private String name;
+  @Column(updatable = false)
   private String email;
   private String phone;
 
-  @Column(unique = true)
+  @Column(unique = true, updatable = false)
   private String cpf;
 
   @ManyToOne(cascade = CascadeType.PERSIST)

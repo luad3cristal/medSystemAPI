@@ -21,13 +21,15 @@ public class Doctor {
   private Long id;
 
   private String name;
+  @Column(updatable = false)
   private String email;
   private String phone;
   
-  @Column(unique = true)
+  @Column(unique = true, updatable = false)
   private String crm;
 
   @Enumerated(EnumType.STRING)
+  @Column(updatable = false)
   private Specialty specialty;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
