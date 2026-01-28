@@ -165,7 +165,7 @@ public class AppointmentService {
     return new AppointmentDTO(this.appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id)));
   }
 
-  public Page<AppointmentDTO> getAllAppointment (Pageable pageable) {
+  public Page<AppointmentDTO> getAllAppointments (Pageable pageable) {
     return this.appointmentRepository.findAll(pageable).map(AppointmentDTO::new);
   }
   
