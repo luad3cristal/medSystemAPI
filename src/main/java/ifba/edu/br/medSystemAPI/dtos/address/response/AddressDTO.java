@@ -15,7 +15,6 @@ public record AddressDTO(
   String zipCode
 ) {
   public AddressDTO (Address address) {
-    // TODO: Tratar NullPointerException se address for null
     this(
       address.getId(), 
       address.getStreet(), 

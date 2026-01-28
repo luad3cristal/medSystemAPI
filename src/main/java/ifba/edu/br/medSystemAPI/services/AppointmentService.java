@@ -39,8 +39,7 @@ public class AppointmentService {
     this.doctorRepository = doctorRepository;
     this.appointmentRepository = appointmentRepository;
   }
-
-  // métodos auxiliares e/ou de validação
+  
 
   private Doctor selectRandomDoctor(LocalDateTime appointmentTime) {
     List<Doctor> allDoctors = doctorRepository.findAll()
@@ -159,7 +158,6 @@ public class AppointmentService {
 
   }
 
-  // métodos get, create e delete
   
   public AppointmentDTO getAppointmentById (Long id) {
     return new AppointmentDTO(this.appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id)));
