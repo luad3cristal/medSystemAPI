@@ -10,6 +10,11 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+/**
+ * Inicializa o usuário administrador no banco de dados.
+ * Executa automaticamente ao subir a aplicação.
+ * Se o admin já existir, não faz nada.
+ */
 @Component
 public class AdminInitializer implements CommandLineRunner {
 
@@ -28,10 +33,11 @@ public class AdminInitializer implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception { 
-        if (!userRepository.existsByUsername(adminEmail)) {
+    public void run(String... args) throws Exception {
+        // Verifica se já existe um admin
+        if (!userRepository.existsByEmail(adminEmail)) {
             User admin = new User();
-            admin.setUsername(adminEmail);
+            admin.setEmail(adminEmail);
             admin.setPassword(passwordEncoder.encode(adminPassword));
             admin.setRole(Role.ADMIN);
             admin.setEnabled(true);
@@ -39,7 +45,7 @@ public class AdminInitializer implements CommandLineRunner {
             admin.setUpdatedAt(LocalDateTime.now());
 
             userRepository.save(admin);
-            
+
             System.out.println("========================================");
             System.out.println("✅ ADMIN CRIADO COM SUCESSO!");
             System.out.println("📧 Email: " + adminEmail);

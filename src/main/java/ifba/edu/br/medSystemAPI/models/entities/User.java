@@ -17,7 +17,7 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String email; 
 
     @Column(nullable = false)
     private String password;
@@ -58,7 +58,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override
@@ -89,8 +89,12 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setPassword(String password) {
@@ -159,11 +163,14 @@ public class User implements UserDetails {
     public String getName() {
         if (role == Role.ADMIN) {
             return "Administrador";
-        } else if (role == Role.DOCTOR && doctor != null) {
+        } 
+        else if (role == Role.DOCTOR && doctor != null) {
             return doctor.getName();
-        } else if (role == Role.PATIENT && patient != null) {
+        } 
+        else if (role == Role.PATIENT && patient != null) {
             return patient.getName();
         }
-        return username;
+
+        return email;
     }
 }
