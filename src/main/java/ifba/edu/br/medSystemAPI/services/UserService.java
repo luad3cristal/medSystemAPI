@@ -28,13 +28,11 @@ public class UserService {
       PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
-  }
-
-  @Transactional
-  public User createDoctorUser(DoctorRegisterDTO dto) {
-    if (userRepository.existsByEmail(dto.email())) {
-      throw new RuntimeException("Email já cadastrado no sistema");
-    }
+  }    @Transactional
+    public User createDoctorUser(DoctorRegisterDTO dto) {
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new ifba.edu.br.medSystemAPI.exceptions.EmailAlreadyExistsException("Email já cadastrado no sistema");
+        }
 
     User user = new User();
     user.setEmail(dto.email());
@@ -65,13 +63,11 @@ public class UserService {
     user.setDoctor(doctor);
 
     return userRepository.save(user);
-  }
-
-  @Transactional
-  public User createPatientUser(PatientRegisterDTO dto) {
-    if (userRepository.existsByEmail(dto.email())) {
-      throw new RuntimeException("Email já cadastrado no sistema");
-    }
+  }    @Transactional
+    public User createPatientUser(PatientRegisterDTO dto) {
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new ifba.edu.br.medSystemAPI.exceptions.EmailAlreadyExistsException("Email já cadastrado no sistema");
+        }
 
     User user = new User();
     user.setEmail(dto.email());

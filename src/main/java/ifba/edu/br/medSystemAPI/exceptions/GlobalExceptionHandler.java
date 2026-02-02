@@ -3,8 +3,14 @@ package ifba.edu.br.medSystemAPI.exceptions;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.auth0.jwt.exceptions.JWTVerificationException;
 
 import ifba.edu.br.medSystemAPI.exceptions.appointment.AppointmentCannotBeCancelledException;
 import ifba.edu.br.medSystemAPI.exceptions.appointment.AppointmentNotFoundException;
@@ -16,6 +22,9 @@ import ifba.edu.br.medSystemAPI.exceptions.doctor.DuplicateDoctorException;
 import ifba.edu.br.medSystemAPI.exceptions.patient.DuplicatePatientException;
 import ifba.edu.br.medSystemAPI.exceptions.patient.PatientNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -78,5 +87,39 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleAppointmentCannotBeCancelled(AppointmentCannotBeCancelledException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
   }
-  
+
+  // authentication and security exceptions
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<String> handleBadCredentials(BadCredentialsException ex) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha inválidos");
+  }
+
+  @ExceptionHandler(DisabledException.class)
+  public ResponseEntity<String> handleDisabled(DisabledException ex) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Usuário aguardando aprovação do administrador");
+  }
+
+  @ExceptionHandler(JWTVerificationException.class)
+  public ResponseEntity<String> handleJWTVerification(JWTVerificationException ex) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido ou expirado");
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<String> handleAccessDenied(AccessDeniedException ex) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado");
+  }
+
+  @ExceptionHandler(EmailAlreadyExistsException.class)
+  public ResponseEntity<String> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
+    Map<String, String> errors = new HashMap<>();
+    ex.getBindingResult().getFieldErrors().forEach(error -> 
+      errors.put(error.getField(), error.getDefaultMessage())
+    );
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+  }
 }
