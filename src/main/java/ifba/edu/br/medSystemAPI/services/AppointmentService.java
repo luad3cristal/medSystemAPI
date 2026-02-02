@@ -28,53 +28,53 @@ import ifba.edu.br.medSystemAPI.models.enums.AppointmentStatus;
 import ifba.edu.br.medSystemAPI.repositories.AppointmentRepository;
 import ifba.edu.br.medSystemAPI.repositories.DoctorRepository;
 import ifba.edu.br.medSystemAPI.repositories.PatientRepository;
+import ifba.edu.br.medSystemAPI.utils.ValidationUtils;
 
 @Service
 public class AppointmentService {
-  
+
   public PatientRepository patientRepository;
   public DoctorRepository doctorRepository;
   public AppointmentRepository appointmentRepository;
 
-  public AppointmentService (PatientRepository patientRepository, DoctorRepository doctorRepository,AppointmentRepository appointmentRepository) {
+  public AppointmentService(PatientRepository patientRepository, DoctorRepository doctorRepository,
+      AppointmentRepository appointmentRepository) {
     this.patientRepository = patientRepository;
     this.doctorRepository = doctorRepository;
     this.appointmentRepository = appointmentRepository;
   }
-  
 
   private Doctor selectRandomDoctor(LocalDateTime appointmentTime) {
     List<Doctor> allDoctors = doctorRepository.findAll()
-    .stream()
-    .filter(this::isDoctorActive)
-    .filter(doctor -> !isDoctorBusy(doctor, appointmentTime))
-    .filter(doctor -> isDoctorAvailableForOneHour(doctor, appointmentTime))
-    .toList();
+        .stream()
+        .filter(this::isDoctorActive)
+        .filter(doctor -> !isDoctorBusy(doctor, appointmentTime))
+        .filter(doctor -> isDoctorAvailableForOneHour(doctor, appointmentTime))
+        .toList();
 
     if (allDoctors.isEmpty()) {
       throw new DoctorNotAvailableException("No doctors available at " + appointmentTime);
     }
-    
+
     List<Doctor> doctorsList = new ArrayList<>(allDoctors);
     Collections.shuffle(doctorsList);
     return doctorsList.get(0);
   }
 
-
-  private boolean isValidBusinessHour (LocalDateTime appointmentTime) {
+  private boolean isValidBusinessHour(LocalDateTime appointmentTime) {
     boolean isSunday = appointmentTime.getDayOfWeek() != DayOfWeek.SUNDAY;
 
-    LocalTime start = LocalTime.of(7,0);
-    LocalTime end = LocalTime.of(19,0);
+    LocalTime start = LocalTime.of(7, 0);
+    LocalTime end = LocalTime.of(19, 0);
     LocalTime time = appointmentTime.toLocalTime();
     boolean isBusinessHour = !time.isBefore(start) && time.isBefore(end);
     return isSunday && isBusinessHour;
   }
-  
-  private boolean hasMinimumAdvanceTime (LocalDateTime appointmentTime) {
+
+  private boolean hasMinimumAdvanceTime(LocalDateTime appointmentTime) {
     return Duration.between(LocalDateTime.now(), appointmentTime).toMinutes() >= 30;
   }
-  
+
   private boolean isPatientActive(Patient patient) {
     return patient.getStatus();
   }
@@ -89,24 +89,27 @@ public class AppointmentService {
 
   private boolean isDoctorAvailableForOneHour(Doctor doctor, LocalDateTime startTime) {
     LocalDateTime endTime = startTime.plusHours(1);
-    List<Appointment> doctorsScheduledAppointments = appointmentRepository.findByDoctorAndAppointmentTimeBetween(doctor, startTime, endTime)
-    .stream()
-    .filter(
-      appointment -> appointment.getStatus() == AppointmentStatus.SCHEDULED
-    ).toList();;
+    List<Appointment> doctorsScheduledAppointments = appointmentRepository
+        .findByDoctorAndAppointmentTimeBetween(doctor, startTime, endTime)
+        .stream()
+        .filter(
+            appointment -> appointment.getStatus() == AppointmentStatus.SCHEDULED)
+        .toList();
+    ;
 
     return doctorsScheduledAppointments.isEmpty();
   }
-  
+
   private boolean hasAppointmentSameDay(Patient patient, LocalDateTime appointmentTime) {
     LocalDateTime starDate = appointmentTime.toLocalDate().atStartOfDay();
     LocalDateTime endDate = appointmentTime.toLocalDate().atTime(23, 59, 59);
-    List<Appointment> patientsScheduledAppointments = appointmentRepository.findByPatientAndAppointmentTimeBetween(patient, starDate, endDate)
-    .stream()
-    .filter(
-      appointment -> appointment.getStatus() == AppointmentStatus.SCHEDULED
-    ).toList();
-    
+    List<Appointment> patientsScheduledAppointments = appointmentRepository
+        .findByPatientAndAppointmentTimeBetween(patient, starDate, endDate)
+        .stream()
+        .filter(
+            appointment -> appointment.getStatus() == AppointmentStatus.SCHEDULED)
+        .toList();
+
     return !patientsScheduledAppointments.isEmpty();
   }
 
@@ -119,7 +122,8 @@ public class AppointmentService {
   private void validateSchedulingRules(Patient patient, Doctor doctor, LocalDateTime appointmentTime) {
 
     if (!isValidBusinessHour(appointmentTime)) {
-      throw new InvalidAppointmentTimeException("Appointments must be scheduled Monday to Saturday, between 07:00 and 19:00");
+      throw new InvalidAppointmentTimeException(
+          "Appointments must be scheduled Monday to Saturday, between 07:00 and 19:00");
     }
 
     if (!hasMinimumAdvanceTime(appointmentTime)) {
@@ -148,46 +152,91 @@ public class AppointmentService {
 
   }
 
-
   private void validateCancellationRules(Appointment appointment) {
     if (appointment.getStatus() != AppointmentStatus.SCHEDULED) {
-      throw new AppointmentCannotBeCancelledException(appointment.getId(), "Only scheduled appointments can be cancelled");
+      throw new AppointmentCannotBeCancelledException(appointment.getId(),
+          "Only scheduled appointments can be cancelled");
     }
 
     if (!canBeCancelled(appointment)) {
-      throw new AppointmentCannotBeCancelledException(appointment.getId(), "Must be cancelled at least 24 hours in advance");
+      throw new AppointmentCannotBeCancelledException(appointment.getId(),
+          "Must be cancelled at least 24 hours in advance");
     }
 
   }
 
-  
-  public AppointmentDTO getAppointmentById (Long id) {
-    return new AppointmentDTO(this.appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id)));
+  public AppointmentDTO getAppointmentById(Long id) {
+    return new AppointmentDTO(
+        this.appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id)));
   }
 
-  public Page<AppointmentDTO> getAllAppointments (Pageable pageable) {
+  public Page<AppointmentDTO> getAllAppointments(Pageable pageable) {
     return this.appointmentRepository.findAll(pageable).map(AppointmentDTO::new);
   }
-  
-  public AppointmentDTO scheduleAppointment (AppointmentCreateDTO appointment) {
-    Patient patientInfo = this.patientRepository.findById(appointment.patientId()).orElseThrow(() -> new PatientNotFoundException(appointment.patientId()));
 
-    Doctor doctorInfo;
-    if (appointment.doctorId() == null) {
-      doctorInfo = selectRandomDoctor(appointment.appointmentTime());
-    } else {
-      doctorInfo = this.doctorRepository.findById(appointment.doctorId()).orElseThrow(() -> new DoctorNotAvailableException("Doctor not found with ID: " + appointment.doctorId()));
-    }
+  public AppointmentDTO scheduleAppointment(AppointmentCreateDTO appointment) {
+    Patient patientInfo = this.patientRepository.findById(appointment.patientId())
+        .orElseThrow(() -> new PatientNotFoundException(appointment.patientId()));
+
+    Doctor doctorInfo = findDoctor(appointment);
 
     validateSchedulingRules(patientInfo, doctorInfo, appointment.appointmentTime());
 
-    Appointment newAppointment = new Appointment(patientInfo, doctorInfo, appointment.appointmentTime(), LocalDateTime.now());
+    Appointment newAppointment = new Appointment(patientInfo, doctorInfo, appointment.appointmentTime(),
+        LocalDateTime.now());
 
     return new AppointmentDTO(this.appointmentRepository.save(newAppointment));
   }
 
-  public AppointmentDTO cancelAppointment (Long id, AppointmentCancelDTO appointment) {
-    Appointment existingAppointment = appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id));
+  /**
+   * Busca o médico baseado em CRM, Nome ou seleciona aleatoriamente
+   */
+  private Doctor findDoctor(AppointmentCreateDTO appointment) {
+    // Se todos os campos estão null, seleciona aleatoriamente
+    if (appointment.doctorCrm() == null &&
+        appointment.doctorName() == null) {
+      return selectRandomDoctor(appointment.appointmentTime());
+    }
+
+    // Prioridade 1: Buscar por CRM
+    if (appointment.doctorCrm() != null && !appointment.doctorCrm().trim().isEmpty()) {
+      if (!ValidationUtils.isValidCRM(appointment.doctorCrm())) {
+        throw new DoctorNotAvailableException(
+            "CRM inválido: " + appointment.doctorCrm() + ". Formato esperado: CRM/UF 000000 (ex: CRM/SP 123456)");
+      }
+      return this.doctorRepository.findByCrm(appointment.doctorCrm())
+          .orElseThrow(
+              () -> new DoctorNotAvailableException("Médico não encontrado com CRM: " + appointment.doctorCrm()));
+    }
+
+    // Prioridade 2: Buscar por Nome
+    if (appointment.doctorName() != null && !appointment.doctorName().trim().isEmpty()) {
+      List<Doctor> doctors = this.doctorRepository.findByNameContainingIgnoreCase(appointment.doctorName());
+
+      if (doctors.isEmpty()) {
+        throw new DoctorNotAvailableException("Nenhum médico encontrado com nome: " + appointment.doctorName());
+      }
+
+      if (doctors.size() > 1) {
+        String doctorNames = doctors.stream()
+            .map(d -> d.getName() + " (CRM: " + d.getCRM() + ")")
+            .reduce((a, b) -> a + ", " + b)
+            .orElse("");
+        throw new DoctorNotAvailableException(
+            "Múltiplos médicos encontrados com nome '" + appointment.doctorName() +
+                "'. Por favor, especifique o CRM. Médicos encontrados: " + doctorNames);
+      }
+
+      return doctors.get(0);
+    }
+
+    // Fallback: seleciona aleatoriamente
+    return selectRandomDoctor(appointment.appointmentTime());
+  }
+
+  public AppointmentDTO cancelAppointment(Long id, AppointmentCancelDTO appointment) {
+    Appointment existingAppointment = appointmentRepository.findById(id)
+        .orElseThrow(() -> new AppointmentNotFoundException(id));
 
     validateCancellationRules(existingAppointment);
 
@@ -196,7 +245,28 @@ public class AppointmentService {
     existingAppointment.setCancelledTime(LocalDateTime.now());
 
     return new AppointmentDTO(this.appointmentRepository.save(existingAppointment));
+  }
 
+  /**
+   * Busca todas as consultas de um paciente específico (paginado)
+   */
+  public Page<AppointmentDTO> getPatientAppointments(Long patientId, Pageable pageable) {
+    Patient patient = patientRepository.findById(patientId)
+        .orElseThrow(() -> new PatientNotFoundException(patientId));
+
+    return appointmentRepository.findByPatient(patient, pageable)
+        .map(AppointmentDTO::new);
+  }
+
+  /**
+   * Busca todas as consultas de um médico específico (paginado)
+   */
+  public Page<AppointmentDTO> getDoctorAppointments(Long doctorId, Pageable pageable) {
+    Doctor doctor = doctorRepository.findById(doctorId)
+        .orElseThrow(() -> new ifba.edu.br.medSystemAPI.exceptions.doctor.DoctorNotFoundException(doctorId));
+
+    return appointmentRepository.findByDoctor(doctor, pageable)
+        .map(AppointmentDTO::new);
   }
 
 }

@@ -31,120 +31,84 @@ import jakarta.validation.Valid;
 public class AppointmentController {
   private AppointmentService appointmentService;
 
-  public AppointmentController (AppointmentService appointmentService) {
+  public AppointmentController(AppointmentService appointmentService) {
     this.appointmentService = appointmentService;
   }
 
   @GetMapping
-  @Operation(
-    summary = "Listar consultas",
-    description = "Retorna uma lista paginada de todas as consultas cadastradas no sistema, ordenadas por data/hora da consulta"
-  )
+  @Operation(summary = "Listar consultas", description = "Retorna uma lista paginada de todas as consultas cadastradas no sistema, ordenadas por data/hora da consulta")
   @ApiResponses(value = {
-    @ApiResponse(
-      responseCode = "200",
-      description = "Lista de consultas retornada com sucesso",
-      content = @Content(
-        mediaType = "application/json",
-        schema = @Schema(implementation = Page.class)
-      )
-    )
+      @ApiResponse(responseCode = "200", description = "Lista de consultas retornada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)))
   })
-  public ResponseEntity<Page<AppointmentDTO>> getAppointments(@PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable) {
+  public ResponseEntity<Page<AppointmentDTO>> getAppointments(
+      @PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable) {
     return ResponseEntity.status(HttpStatus.OK)
-    .body(appointmentService.getAllAppointments(pageable));
+        .body(appointmentService.getAllAppointments(pageable));
   }
 
   @GetMapping("/{id}")
-  @Operation(
-    summary = "Buscar consulta por ID",
-    description = "Retorna os detalhes completos de uma consulta específica"
-  )
+  @Operation(summary = "Buscar consulta por ID", description = "Retorna os detalhes completos de uma consulta específica")
   @ApiResponses(value = {
-    @ApiResponse(
-      responseCode = "200",
-      description = "Consulta encontrada com sucesso",
-      content = @Content(
-        mediaType = "application/json",
-        schema = @Schema(implementation = AppointmentDTO.class)
-      )
-    ),
-    @ApiResponse(
-      responseCode = "404",
-      description = "Consulta não encontrada com o ID fornecido",
-      content = @Content(mediaType = "application/json")
-    )
+      @ApiResponse(responseCode = "200", description = "Consulta encontrada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AppointmentDTO.class))),
+      @ApiResponse(responseCode = "404", description = "Consulta não encontrada com o ID fornecido", content = @Content(mediaType = "application/json"))
   })
-  public ResponseEntity<AppointmentDTO> getAppointmentById (@PathVariable Long id) {
+  public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Long id) {
     return ResponseEntity.status(HttpStatus.OK)
-    .body(appointmentService.getAppointmentById(id));
+        .body(appointmentService.getAppointmentById(id));
   }
 
   @PostMapping()
-  @Operation(
-    summary = "Agendar consulta",
-    description = "Agenda uma nova consulta médica, em que o médico pode ser especificado (doctorId) ou selecionado aleatoriamente (doctorId = null). " 
-    + "Regras: horário de segunda a sábado das 07:00 às 19:00, antecedência mínima de 30 minutos, " 
-    + "paciente não pode ter mais de uma consulta no mesmo dia, médico não pode ter conflitos de horário"
-  )
+  @Operation(summary = "Agendar consulta", description = "Agenda uma nova consulta médica, em que o médico pode ser especificado (doctorId) ou selecionado aleatoriamente (doctorId = null). "
+      + "Regras: horário de segunda a sábado das 07:00 às 19:00, antecedência mínima de 30 minutos, "
+      + "paciente não pode ter mais de uma consulta no mesmo dia, médico não pode ter conflitos de horário")
   @ApiResponses(value = {
-    @ApiResponse(
-      responseCode = "201",
-      description = "Consulta agendada com sucesso",
-      content = @Content(
-        mediaType = "application/json",
-        schema = @Schema(implementation = AppointmentDTO.class)
-      )
-    ),
-    @ApiResponse(
-      responseCode = "400",
-      description = "Dados inválidos (horário fora do expediente, antecedência insuficiente, campos obrigatórios ausentes)",
-      content = @Content(mediaType = "application/json")
-    ),
-    @ApiResponse(
-      responseCode = "404",
-      description = "Paciente ou médico não encontrado",
-      content = @Content(mediaType = "application/json")
-    ),
-    @ApiResponse(
-      responseCode = "409",
-      description = "Conflito de agendamento (médico ocupado, paciente já tem consulta no dia, médico ou paciente inativo)",
-      content = @Content(mediaType = "application/json")
-    )
+      @ApiResponse(responseCode = "201", description = "Consulta agendada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AppointmentDTO.class))),
+      @ApiResponse(responseCode = "400", description = "Dados inválidos (horário fora do expediente, antecedência insuficiente, campos obrigatórios ausentes)", content = @Content(mediaType = "application/json")),
+      @ApiResponse(responseCode = "404", description = "Paciente ou médico não encontrado", content = @Content(mediaType = "application/json")),
+      @ApiResponse(responseCode = "409", description = "Conflito de agendamento (médico ocupado, paciente já tem consulta no dia, médico ou paciente inativo)", content = @Content(mediaType = "application/json"))
   })
   public ResponseEntity<AppointmentDTO> scheduleAppointment(@RequestBody @Valid AppointmentCreateDTO appointment) {
     return ResponseEntity.status(HttpStatus.CREATED)
-    .body(appointmentService.scheduleAppointment(appointment));
+        .body(appointmentService.scheduleAppointment(appointment));
   }
 
   @DeleteMapping("/{id}")
-  @Operation(
-    summary = "Cancelar consulta",
-    description = "Cancela uma consulta agendada, requerindo o motivo do cancelamento e exigindo que seja feito com antecedência mínima de 24 horas"
-  )
+  @Operation(summary = "Cancelar consulta", description = "Cancela uma consulta agendada, requerindo o motivo do cancelamento e exigindo que seja feito com antecedência mínima de 24 horas")
   @ApiResponses(value = {
-    @ApiResponse(
-      responseCode = "200",
-      description = "Consulta cancelada com sucesso",
-      content = @Content(
-        mediaType = "application/json",
-        schema = @Schema(implementation = AppointmentDTO.class)
-      )
-    ),
-    @ApiResponse(
-      responseCode = "400",
-      description = "Cancelamento inválido (antecedência menor que 24 horas, motivo não fornecido ou consulta já cancelada)",
-      content = @Content(mediaType = "application/json")
-    ),
-    @ApiResponse(
-      responseCode = "404",
-      description = "Consulta não encontrada com o ID fornecido",
-      content = @Content(mediaType = "application/json")
-    )
+      @ApiResponse(responseCode = "200", description = "Consulta cancelada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AppointmentDTO.class))),
+      @ApiResponse(responseCode = "400", description = "Cancelamento inválido (antecedência menor que 24 horas, motivo não fornecido ou consulta já cancelada)", content = @Content(mediaType = "application/json")),
+      @ApiResponse(responseCode = "404", description = "Consulta não encontrada com o ID fornecido", content = @Content(mediaType = "application/json"))
   })
-  public ResponseEntity<AppointmentDTO> cancelAppointment(@PathVariable Long id, @RequestBody @Valid AppointmentCancelDTO appointment) {
+  public ResponseEntity<AppointmentDTO> cancelAppointment(@PathVariable Long id,
+      @RequestBody @Valid AppointmentCancelDTO appointment) {
     return ResponseEntity.status(HttpStatus.OK)
-    .body(appointmentService.cancelAppointment(id, appointment));
+        .body(appointmentService.cancelAppointment(id, appointment));
   }
-  
+
+  @GetMapping("/patient/{patientId}/my-consultations")
+  @Operation(summary = "Listar consultas do paciente", description = "Retorna todas as consultas de um paciente específico, ordenadas por data/hora")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Lista de consultas do paciente retornada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+      @ApiResponse(responseCode = "404", description = "Paciente não encontrado", content = @Content(mediaType = "application/json"))
+  })
+  public ResponseEntity<Page<AppointmentDTO>> getPatientAppointments(
+      @PathVariable Long patientId,
+      @PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(appointmentService.getPatientAppointments(patientId, pageable));
+  }
+
+  @GetMapping("/doctor/{doctorId}/my-consultations")
+  @Operation(summary = "Listar consultas do médico", description = "Retorna todas as consultas de um médico específico, ordenadas por data/hora")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Lista de consultas do médico retornada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+      @ApiResponse(responseCode = "404", description = "Médico não encontrado", content = @Content(mediaType = "application/json"))
+  })
+  public ResponseEntity<Page<AppointmentDTO>> getDoctorAppointments(
+      @PathVariable Long doctorId,
+      @PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(appointmentService.getDoctorAppointments(doctorId, pageable));
+  }
+
 }
