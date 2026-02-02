@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,12 +23,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/appointments")
 @Tag(name = "Consultas", description = "Endpoints para gerenciamento de consultas médicas")
+@SecurityRequirement(name = "bearer-key")
 public class AppointmentController {
   private AppointmentService appointmentService;
 
@@ -36,9 +39,11 @@ public class AppointmentController {
   }
 
   @GetMapping
-  @Operation(summary = "Listar consultas", description = "Retorna uma lista paginada de todas as consultas cadastradas no sistema, ordenadas por data/hora da consulta")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Listar TODAS as consultas (ADMIN apenas)", description = "Retorna uma lista paginada de todas as consultas cadastradas no sistema, ordenadas por data/hora da consulta. Acesso restrito a ADMIN.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Lista de consultas retornada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)))
+      @ApiResponse(responseCode = "200", description = "Lista de consultas retornada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+      @ApiResponse(responseCode = "403", description = "Acesso negado - apenas ADMIN pode listar todas as consultas", content = @Content(mediaType = "application/json"))
   })
   public ResponseEntity<Page<AppointmentDTO>> getAppointments(
       @PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable) {
@@ -47,7 +52,8 @@ public class AppointmentController {
   }
 
   @GetMapping("/{id}")
-  @Operation(summary = "Buscar consulta por ID", description = "Retorna os detalhes completos de uma consulta específica")
+  @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Buscar consulta por ID (ADMIN apenas)", description = "Retorna os detalhes completos de uma consulta específica. Acesso restrito a ADMIN.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Consulta encontrada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AppointmentDTO.class))),
       @ApiResponse(responseCode = "404", description = "Consulta não encontrada com o ID fornecido", content = @Content(mediaType = "application/json"))
@@ -58,7 +64,9 @@ public class AppointmentController {
   }
 
   @PostMapping()
-  @Operation(summary = "Agendar consulta", description = "Agenda uma nova consulta médica, em que o médico pode ser especificado (doctorId) ou selecionado aleatoriamente (doctorId = null). "
+  @PreAuthorize("hasAnyRole('PATIENT', 'ADMIN')")
+  @Operation(summary = "Agendar consulta (PACIENTE ou ADMIN)", description = "Agenda uma nova consulta médica. Pacientes podem agendar para si mesmos, ADMIN pode agendar para qualquer paciente. "
+      + "O médico pode ser especificado por CRM ou nome, ou selecionado aleatoriamente. "
       + "Regras: horário de segunda a sábado das 07:00 às 19:00, antecedência mínima de 30 minutos, "
       + "paciente não pode ter mais de uma consulta no mesmo dia, médico não pode ter conflitos de horário")
   @ApiResponses(value = {
@@ -73,7 +81,9 @@ public class AppointmentController {
   }
 
   @DeleteMapping("/{id}")
-  @Operation(summary = "Cancelar consulta", description = "Cancela uma consulta agendada, requerindo o motivo do cancelamento e exigindo que seja feito com antecedência mínima de 24 horas")
+  @PreAuthorize("hasAnyRole('PATIENT', 'DOCTOR', 'ADMIN')")
+  @Operation(summary = "Cancelar consulta (Paciente, Médico ou ADMIN)", description = "Cancela uma consulta agendada, requerindo o motivo do cancelamento e exigindo que seja feito com antecedência mínima de 24 horas. "
+      + "Pacientes podem cancelar suas próprias consultas, médicos podem cancelar consultas onde são o médico responsável, ADMIN pode cancelar qualquer consulta.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Consulta cancelada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AppointmentDTO.class))),
       @ApiResponse(responseCode = "400", description = "Cancelamento inválido (antecedência menor que 24 horas, motivo não fornecido ou consulta já cancelada)", content = @Content(mediaType = "application/json")),
@@ -86,9 +96,12 @@ public class AppointmentController {
   }
 
   @GetMapping("/patient/{patientId}/my-consultations")
-  @Operation(summary = "Listar consultas do paciente", description = "Retorna todas as consultas de um paciente específico, ordenadas por data/hora")
+  @PreAuthorize("hasAnyRole('PATIENT', 'ADMIN')")
+  @Operation(summary = "Listar consultas do paciente", description = "Retorna todas as consultas de um paciente específico, ordenadas por data/hora. "
+      + "Pacientes podem ver apenas suas próprias consultas, ADMIN pode ver de qualquer paciente.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Lista de consultas do paciente retornada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+      @ApiResponse(responseCode = "403", description = "Acesso negado - paciente tentando acessar consultas de outro paciente", content = @Content(mediaType = "application/json")),
       @ApiResponse(responseCode = "404", description = "Paciente não encontrado", content = @Content(mediaType = "application/json"))
   })
   public ResponseEntity<Page<AppointmentDTO>> getPatientAppointments(
@@ -99,9 +112,12 @@ public class AppointmentController {
   }
 
   @GetMapping("/doctor/{doctorId}/my-consultations")
-  @Operation(summary = "Listar consultas do médico", description = "Retorna todas as consultas de um médico específico, ordenadas por data/hora")
+  @PreAuthorize("hasAnyRole('DOCTOR', 'ADMIN')")
+  @Operation(summary = "Listar consultas do médico", description = "Retorna todas as consultas de um médico específico, ordenadas por data/hora. "
+      + "Médicos podem ver apenas suas próprias consultas, ADMIN pode ver de qualquer médico.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Lista de consultas do médico retornada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+      @ApiResponse(responseCode = "403", description = "Acesso negado - médico tentando acessar consultas de outro médico", content = @Content(mediaType = "application/json")),
       @ApiResponse(responseCode = "404", description = "Médico não encontrado", content = @Content(mediaType = "application/json"))
   })
   public ResponseEntity<Page<AppointmentDTO>> getDoctorAppointments(
