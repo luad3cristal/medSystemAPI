@@ -8,13 +8,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.OneToOne;
 
-@Entity
-@Table(name = "patients")
+@Entity(name = "patients")
 public class Patient {
   @Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   private String name;
@@ -31,9 +30,14 @@ public class Patient {
 
   private Boolean status = true;
 
-  public Patient () {}
+  @OneToOne
+  @JoinColumn(name = "user_id", unique = true)
+  private User user;
 
-  public Patient (String name, String email, String phone, String cpf, Address address) {
+  public Patient() {
+  }
+
+  public Patient(String name, String email, String phone, String cpf, Address address) {
     this.name = name;
     this.email = email;
     this.phone = phone;
@@ -41,25 +45,67 @@ public class Patient {
     this.address = address;
   }
 
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
+  public Long getId() {
+    return id;
+  }
 
-  public String getName() { return name; }
-  public void setName(String name) { this.name = name; }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-  public String getEmail() { return email; }
-  public void setEmail(String email) { this.email = email; }
+  public String getName() {
+    return name;
+  }
 
-  public String getPhone() { return phone; }
-  public void setPhone(String phone) { this.phone = phone; }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-  public String getCPF() { return cpf; }
-  public void setCPF(String cpf) { this.cpf = cpf; }
+  public String getEmail() {
+    return email;
+  }
 
-  public Address getAddress() { return address; }
-  public void setAddress(Address address) { this.address = address; }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-  public Boolean getStatus() { return status; }
-  public void setStatus(Boolean status) { this.status = status; }
+  public String getPhone() {
+    return phone;
+  }
 
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
+
+  public String getCPF() {
+    return cpf;
+  }
+
+  public void setCPF(String cpf) {
+    this.cpf = cpf;
+  }
+
+  public Address getAddress() {
+    return address;
+  }
+
+  public void setAddress(Address address) {
+    this.address = address;
+  }
+
+  public Boolean getStatus() {
+    return status;
+  }
+
+  public void setStatus(Boolean status) {
+    this.status = status;
+  }
+
+  public User getUser() {
+    return user;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
+  }
 }
