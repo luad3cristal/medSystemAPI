@@ -10,11 +10,14 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import ifba.edu.br.medSystemAPI.dtos.appointment.request.AppointmentCancelDTO;
 import ifba.edu.br.medSystemAPI.dtos.appointment.request.AppointmentCreateDTO;
 import ifba.edu.br.medSystemAPI.dtos.appointment.response.AppointmentDTO;
+import ifba.edu.br.medSystemAPI.exceptions.AccessDeniedException;
 import ifba.edu.br.medSystemAPI.exceptions.appointment.AppointmentCannotBeCancelledException;
 import ifba.edu.br.medSystemAPI.exceptions.appointment.AppointmentNotFoundException;
 import ifba.edu.br.medSystemAPI.exceptions.appointment.DoctorNotAvailableException;
@@ -24,7 +27,9 @@ import ifba.edu.br.medSystemAPI.exceptions.patient.PatientNotFoundException;
 import ifba.edu.br.medSystemAPI.models.entities.Appointment;
 import ifba.edu.br.medSystemAPI.models.entities.Doctor;
 import ifba.edu.br.medSystemAPI.models.entities.Patient;
+import ifba.edu.br.medSystemAPI.models.entities.User;
 import ifba.edu.br.medSystemAPI.models.enums.AppointmentStatus;
+import ifba.edu.br.medSystemAPI.models.enums.Role;
 import ifba.edu.br.medSystemAPI.repositories.AppointmentRepository;
 import ifba.edu.br.medSystemAPI.repositories.DoctorRepository;
 import ifba.edu.br.medSystemAPI.repositories.PatientRepository;
@@ -249,10 +254,14 @@ public class AppointmentService {
 
   /**
    * Busca todas as consultas de um paciente específico (paginado)
+   * Valida se o usuário tem permissão para acessar as consultas
    */
   public Page<AppointmentDTO> getPatientAppointments(Long patientId, Pageable pageable) {
     Patient patient = patientRepository.findById(patientId)
         .orElseThrow(() -> new PatientNotFoundException(patientId));
+
+    // Validar acesso: apenas o próprio paciente ou ADMIN pode ver
+    validatePatientAccess(patient);
 
     return appointmentRepository.findByPatient(patient, pageable)
         .map(AppointmentDTO::new);
@@ -260,13 +269,67 @@ public class AppointmentService {
 
   /**
    * Busca todas as consultas de um médico específico (paginado)
+   * Valida se o usuário tem permissão para acessar as consultas
    */
   public Page<AppointmentDTO> getDoctorAppointments(Long doctorId, Pageable pageable) {
     Doctor doctor = doctorRepository.findById(doctorId)
         .orElseThrow(() -> new ifba.edu.br.medSystemAPI.exceptions.doctor.DoctorNotFoundException(doctorId));
 
+    // Validar acesso: apenas o próprio médico ou ADMIN pode ver
+    validateDoctorAccess(doctor);
+
     return appointmentRepository.findByDoctor(doctor, pageable)
         .map(AppointmentDTO::new);
+  }
+
+  /**
+   * Valida se o usuário autenticado tem permissão para acessar dados do paciente
+   * Permite acesso apenas ao próprio paciente ou ADMIN
+   */
+  private void validatePatientAccess(Patient patient) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    User currentUser = (User) authentication.getPrincipal();
+
+    // ADMIN pode acessar tudo
+    if (currentUser.getRole() == Role.ADMIN) {
+      return;
+    }
+
+    // PATIENT pode acessar apenas suas próprias consultas
+    if (currentUser.getRole() == Role.PATIENT) {
+      if (currentUser.getPatient() == null || !currentUser.getPatient().getId().equals(patient.getId())) {
+        throw new AccessDeniedException("Você só pode acessar suas próprias consultas");
+      }
+      return;
+    }
+
+    // Outros roles não têm acesso
+    throw new AccessDeniedException("Acesso negado às consultas deste paciente");
+  }
+
+  /**
+   * Valida se o usuário autenticado tem permissão para acessar dados do médico
+   * Permite acesso apenas ao próprio médico ou ADMIN
+   */
+  private void validateDoctorAccess(Doctor doctor) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    User currentUser = (User) authentication.getPrincipal();
+
+    // ADMIN pode acessar tudo
+    if (currentUser.getRole() == Role.ADMIN) {
+      return;
+    }
+
+    // DOCTOR pode acessar apenas suas próprias consultas
+    if (currentUser.getRole() == Role.DOCTOR) {
+      if (currentUser.getDoctor() == null || !currentUser.getDoctor().getId().equals(doctor.getId())) {
+        throw new AccessDeniedException("Você só pode acessar suas próprias consultas");
+      }
+      return;
+    }
+
+    // Outros roles não têm acesso
+    throw new AccessDeniedException("Acesso negado às consultas deste médico");
   }
 
 }

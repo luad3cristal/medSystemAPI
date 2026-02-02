@@ -33,18 +33,18 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleDoctorNotFound(DoctorNotFoundException ex) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
   }
-  
-  @ExceptionHandler(DuplicateDoctorException.class)  
+
+  @ExceptionHandler(DuplicateDoctorException.class)
   public ResponseEntity<String> handleDuplicateDoctor(DuplicateDoctorException ex) {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
   }
-  
+
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ResponseEntity<String> handleDataIntegrity(DataIntegrityViolationException ex) {
     String message = "Data integrity violation: " + ex.getMessage();
     return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
   }
-  
+
   @ExceptionHandler(ConstraintViolationException.class)
   public ResponseEntity<String> handleConstraintViolation(ConstraintViolationException ex) {
     String message = "Validation failed: " + ex.getMessage();
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
   }
 
-  @ExceptionHandler(DuplicatePatientException.class)  
+  @ExceptionHandler(DuplicatePatientException.class)
   public ResponseEntity<String> handleDuplicatePatient(DuplicatePatientException ex) {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
   }
@@ -109,6 +109,11 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado");
   }
 
+  @ExceptionHandler(ifba.edu.br.medSystemAPI.exceptions.AccessDeniedException.class)
+  public ResponseEntity<String> handleCustomAccessDenied(ifba.edu.br.medSystemAPI.exceptions.AccessDeniedException ex) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+  }
+
   @ExceptionHandler(EmailAlreadyExistsException.class)
   public ResponseEntity<String> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
@@ -117,9 +122,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
     Map<String, String> errors = new HashMap<>();
-    ex.getBindingResult().getFieldErrors().forEach(error -> 
-      errors.put(error.getField(), error.getDefaultMessage())
-    );
+    ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
   }
 }
