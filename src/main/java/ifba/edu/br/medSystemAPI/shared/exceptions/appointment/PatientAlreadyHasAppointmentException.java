@@ -1,4 +1,4 @@
-package ifba.edu.br.medSystemAPI.exceptions.appointment;
+package ifba.edu.br.medSystemAPI.shared.exceptions.appointment;
 
 import java.time.LocalDate;
 

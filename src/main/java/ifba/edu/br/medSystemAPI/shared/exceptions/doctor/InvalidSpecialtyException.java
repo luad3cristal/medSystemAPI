@@ -1,4 +1,4 @@
-package ifba.edu.br.medSystemAPI.exceptions.doctor;
+package ifba.edu.br.medSystemAPI.shared.exceptions.doctor;
 
 public class InvalidSpecialtyException extends RuntimeException {
   public InvalidSpecialtyException(String specialty) {

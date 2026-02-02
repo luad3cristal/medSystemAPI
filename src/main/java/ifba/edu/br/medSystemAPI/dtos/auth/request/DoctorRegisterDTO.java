@@ -1,8 +1,8 @@
 package ifba.edu.br.medSystemAPI.dtos.auth.request;
 
 import ifba.edu.br.medSystemAPI.dtos.address.request.AddressRequestDTO;
-import ifba.edu.br.medSystemAPI.validators.ValidCRM;
-import ifba.edu.br.medSystemAPI.validators.ValidPhone;
+import ifba.edu.br.medSystemAPI.shared.validators.ValidCRM;
+import ifba.edu.br.medSystemAPI.shared.validators.ValidPhone;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;

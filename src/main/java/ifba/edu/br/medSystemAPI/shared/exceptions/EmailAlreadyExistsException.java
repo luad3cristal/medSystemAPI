@@ -1,4 +1,4 @@
-package ifba.edu.br.medSystemAPI.exceptions;
+package ifba.edu.br.medSystemAPI.shared.exceptions;
 
 public class EmailAlreadyExistsException extends RuntimeException {
   public EmailAlreadyExistsException(String message) {

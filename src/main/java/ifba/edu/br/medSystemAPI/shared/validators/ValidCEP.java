@@ -1,4 +1,4 @@
-package ifba.edu.br.medSystemAPI.validators;
+package ifba.edu.br.medSystemAPI.shared.validators;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

@@ -17,13 +17,6 @@ import org.springframework.stereotype.Service;
 import ifba.edu.br.medSystemAPI.dtos.appointment.request.AppointmentCancelDTO;
 import ifba.edu.br.medSystemAPI.dtos.appointment.request.AppointmentCreateDTO;
 import ifba.edu.br.medSystemAPI.dtos.appointment.response.AppointmentDTO;
-import ifba.edu.br.medSystemAPI.exceptions.AccessDeniedException;
-import ifba.edu.br.medSystemAPI.exceptions.appointment.AppointmentCannotBeCancelledException;
-import ifba.edu.br.medSystemAPI.exceptions.appointment.AppointmentNotFoundException;
-import ifba.edu.br.medSystemAPI.exceptions.appointment.DoctorNotAvailableException;
-import ifba.edu.br.medSystemAPI.exceptions.appointment.InvalidAppointmentTimeException;
-import ifba.edu.br.medSystemAPI.exceptions.appointment.PatientAlreadyHasAppointmentException;
-import ifba.edu.br.medSystemAPI.exceptions.patient.PatientNotFoundException;
 import ifba.edu.br.medSystemAPI.models.entities.Appointment;
 import ifba.edu.br.medSystemAPI.models.entities.Doctor;
 import ifba.edu.br.medSystemAPI.models.entities.Patient;
@@ -33,7 +26,14 @@ import ifba.edu.br.medSystemAPI.models.enums.Role;
 import ifba.edu.br.medSystemAPI.repositories.AppointmentRepository;
 import ifba.edu.br.medSystemAPI.repositories.DoctorRepository;
 import ifba.edu.br.medSystemAPI.repositories.PatientRepository;
-import ifba.edu.br.medSystemAPI.utils.ValidationUtils;
+import ifba.edu.br.medSystemAPI.shared.exceptions.AccessDeniedException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.AppointmentCannotBeCancelledException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.AppointmentNotFoundException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.DoctorNotAvailableException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.InvalidAppointmentTimeException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.PatientAlreadyHasAppointmentException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.patient.PatientNotFoundException;
+import ifba.edu.br.medSystemAPI.shared.utils.ValidationUtils;
 
 @Service
 public class AppointmentService {
@@ -273,7 +273,7 @@ public class AppointmentService {
    */
   public Page<AppointmentDTO> getDoctorAppointments(Long doctorId, Pageable pageable) {
     Doctor doctor = doctorRepository.findById(doctorId)
-        .orElseThrow(() -> new ifba.edu.br.medSystemAPI.exceptions.doctor.DoctorNotFoundException(doctorId));
+        .orElseThrow(() -> new ifba.edu.br.medSystemAPI.shared.exceptions.doctor.DoctorNotFoundException(doctorId));
 
     // Validar acesso: apenas o próprio médico ou ADMIN pode ver
     validateDoctorAccess(doctor);

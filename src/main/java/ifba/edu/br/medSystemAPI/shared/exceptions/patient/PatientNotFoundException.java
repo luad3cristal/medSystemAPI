@@ -1,4 +1,4 @@
-package ifba.edu.br.medSystemAPI.exceptions.patient;
+package ifba.edu.br.medSystemAPI.shared.exceptions.patient;
 
 public class PatientNotFoundException extends RuntimeException {
   public PatientNotFoundException(Long id) {

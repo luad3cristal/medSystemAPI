@@ -1,7 +1,7 @@
 package ifba.edu.br.medSystemAPI.dtos.address.request;
 
 import ifba.edu.br.medSystemAPI.models.entities.Address;
-import ifba.edu.br.medSystemAPI.validators.ValidCEP;
+import ifba.edu.br.medSystemAPI.shared.validators.ValidCEP;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import io.swagger.v3.oas.annotations.media.Schema;

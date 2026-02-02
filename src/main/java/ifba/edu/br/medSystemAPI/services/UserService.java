@@ -31,7 +31,7 @@ public class UserService {
   }    @Transactional
     public User createDoctorUser(DoctorRegisterDTO dto) {
         if (userRepository.existsByEmail(dto.email())) {
-            throw new ifba.edu.br.medSystemAPI.exceptions.EmailAlreadyExistsException("Email já cadastrado no sistema");
+            throw new ifba.edu.br.medSystemAPI.shared.exceptions.EmailAlreadyExistsException("Email já cadastrado no sistema");
         }
 
     User user = new User();
@@ -66,7 +66,7 @@ public class UserService {
   }    @Transactional
     public User createPatientUser(PatientRegisterDTO dto) {
         if (userRepository.existsByEmail(dto.email())) {
-            throw new ifba.edu.br.medSystemAPI.exceptions.EmailAlreadyExistsException("Email já cadastrado no sistema");
+            throw new ifba.edu.br.medSystemAPI.shared.exceptions.EmailAlreadyExistsException("Email já cadastrado no sistema");
         }
 
     User user = new User();

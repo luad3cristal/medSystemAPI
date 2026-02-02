@@ -1,6 +1,6 @@
-package ifba.edu.br.medSystemAPI.validators;
+package ifba.edu.br.medSystemAPI.shared.validators;
 
-import ifba.edu.br.medSystemAPI.utils.ValidationUtils;
+import ifba.edu.br.medSystemAPI.shared.utils.ValidationUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

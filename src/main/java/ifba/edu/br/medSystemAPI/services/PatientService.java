@@ -9,11 +9,11 @@ import ifba.edu.br.medSystemAPI.dtos.address.request.AddressRequestDTO;
 import ifba.edu.br.medSystemAPI.dtos.patient.request.PatientCreateDTO;
 import ifba.edu.br.medSystemAPI.dtos.patient.request.PatientUpdateDTO;
 import ifba.edu.br.medSystemAPI.dtos.patient.response.PatientDTO;
-import ifba.edu.br.medSystemAPI.exceptions.patient.DuplicatePatientException;
-import ifba.edu.br.medSystemAPI.exceptions.patient.PatientNotFoundException;
 import ifba.edu.br.medSystemAPI.models.entities.Address;
 import ifba.edu.br.medSystemAPI.models.entities.Patient;
 import ifba.edu.br.medSystemAPI.repositories.PatientRepository;
+import ifba.edu.br.medSystemAPI.shared.exceptions.patient.DuplicatePatientException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.patient.PatientNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 
 @Service

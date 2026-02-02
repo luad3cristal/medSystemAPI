@@ -1,4 +1,4 @@
-package ifba.edu.br.medSystemAPI.exceptions.appointment;
+package ifba.edu.br.medSystemAPI.shared.exceptions.appointment;
 
 public class InvalidAppointmentTimeException extends RuntimeException {
   public InvalidAppointmentTimeException(String message) {

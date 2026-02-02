@@ -1,4 +1,4 @@
-package ifba.edu.br.medSystemAPI.utils;
+package ifba.edu.br.medSystemAPI.shared.utils;
 
 import java.util.regex.Pattern;
 

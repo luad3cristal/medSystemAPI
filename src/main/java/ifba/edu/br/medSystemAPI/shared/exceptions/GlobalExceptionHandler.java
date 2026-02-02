@@ -1,4 +1,4 @@
-package ifba.edu.br.medSystemAPI.exceptions;
+package ifba.edu.br.medSystemAPI.shared.exceptions;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
-import ifba.edu.br.medSystemAPI.exceptions.appointment.AppointmentCannotBeCancelledException;
-import ifba.edu.br.medSystemAPI.exceptions.appointment.AppointmentNotFoundException;
-import ifba.edu.br.medSystemAPI.exceptions.appointment.DoctorNotAvailableException;
-import ifba.edu.br.medSystemAPI.exceptions.appointment.InvalidAppointmentTimeException;
-import ifba.edu.br.medSystemAPI.exceptions.appointment.PatientAlreadyHasAppointmentException;
-import ifba.edu.br.medSystemAPI.exceptions.doctor.DoctorNotFoundException;
-import ifba.edu.br.medSystemAPI.exceptions.doctor.DuplicateDoctorException;
-import ifba.edu.br.medSystemAPI.exceptions.patient.DuplicatePatientException;
-import ifba.edu.br.medSystemAPI.exceptions.patient.PatientNotFoundException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.AppointmentCannotBeCancelledException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.AppointmentNotFoundException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.DoctorNotAvailableException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.InvalidAppointmentTimeException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.PatientAlreadyHasAppointmentException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.doctor.DoctorNotFoundException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.doctor.DuplicateDoctorException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.patient.DuplicatePatientException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.patient.PatientNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 
 import java.util.HashMap;
@@ -109,8 +109,8 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado");
   }
 
-  @ExceptionHandler(ifba.edu.br.medSystemAPI.exceptions.AccessDeniedException.class)
-  public ResponseEntity<String> handleCustomAccessDenied(ifba.edu.br.medSystemAPI.exceptions.AccessDeniedException ex) {
+  @ExceptionHandler(ifba.edu.br.medSystemAPI.shared.exceptions.AccessDeniedException.class)
+  public ResponseEntity<String> handleCustomAccessDenied(ifba.edu.br.medSystemAPI.shared.exceptions.AccessDeniedException ex) {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
   }
 

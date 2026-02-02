@@ -9,13 +9,13 @@ import ifba.edu.br.medSystemAPI.dtos.address.request.AddressRequestDTO;
 import ifba.edu.br.medSystemAPI.dtos.doctor.request.DoctorCreateDTO;
 import ifba.edu.br.medSystemAPI.dtos.doctor.request.DoctorUpdateDTO;
 import ifba.edu.br.medSystemAPI.dtos.doctor.response.DoctorDTO;
-import ifba.edu.br.medSystemAPI.exceptions.doctor.DoctorNotFoundException;
-import ifba.edu.br.medSystemAPI.exceptions.doctor.DuplicateDoctorException;
-import ifba.edu.br.medSystemAPI.exceptions.doctor.InvalidSpecialtyException;
 import ifba.edu.br.medSystemAPI.models.entities.Address;
 import ifba.edu.br.medSystemAPI.models.entities.Doctor;
 import ifba.edu.br.medSystemAPI.models.enums.Specialty;
 import ifba.edu.br.medSystemAPI.repositories.DoctorRepository;
+import ifba.edu.br.medSystemAPI.shared.exceptions.doctor.DoctorNotFoundException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.doctor.DuplicateDoctorException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.doctor.InvalidSpecialtyException;
 import jakarta.validation.ConstraintViolationException;
 
 @Service
