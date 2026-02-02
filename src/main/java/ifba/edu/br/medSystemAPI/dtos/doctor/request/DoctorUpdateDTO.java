@@ -2,9 +2,9 @@ package ifba.edu.br.medSystemAPI.dtos.doctor.request;
 
 import ifba.edu.br.medSystemAPI.dtos.address.request.AddressRequestDTO;
 import ifba.edu.br.medSystemAPI.models.entities.Doctor;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.NotBlank;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "Dados para atualização de médico (não permite alterar email, CRM e especialidade)")
 public record DoctorUpdateDTO(
@@ -27,14 +27,22 @@ public record DoctorUpdateDTO(
   @Schema(
     description = "Endereço completo atualizado do médico"
   )
-  AddressRequestDTO address
+  AddressRequestDTO address,
+
+  @NotNull(message= "Status is required")
+  @Schema(
+    description = "Status do médico (ativo/inativo)",
+    example = "true"
+  )
+  Boolean status
 ) {
   
   public DoctorUpdateDTO (Doctor doctor) {
     this(
       doctor.getName(), 
       doctor.getPhone(),
-      new AddressRequestDTO(doctor.getAddress())
+      new AddressRequestDTO(doctor.getAddress()),
+      doctor.getStatus()
     );
   }
 

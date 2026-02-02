@@ -75,15 +75,12 @@ public class PatientService {
   public PatientDTO updatePatient(Long id, PatientUpdateDTO patient) {
     Patient existingPatient = this.patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException(id));
 
-    if (existingPatient.getStatus()) {
-      existingPatient.setName(patient.name());
-      existingPatient.setPhone(patient.phone());
-      updatePatientAddress(existingPatient, patient.address());
+    existingPatient.setName(patient.name());
+    existingPatient.setPhone(patient.phone());
+    existingPatient.setStatus(patient.status());
+    updatePatientAddress(existingPatient, patient.address());
 
-      return new PatientDTO(this.patientRepository.save(existingPatient));
-    }
-
-    return null;
+    return new PatientDTO(this.patientRepository.save(existingPatient));
   }
 
   public PatientDTO deactivePatientAccount (Long id) {

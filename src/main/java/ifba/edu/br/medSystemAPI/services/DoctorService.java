@@ -82,15 +82,12 @@ public class DoctorService {
   public DoctorDTO updateDoctor(Long id, DoctorUpdateDTO doctor) {
     Doctor existingDoctor = this.doctorRepository.findById(id).orElseThrow(() -> new DoctorNotFoundException(id));
 
-    if (existingDoctor.getStatus()) {
-      existingDoctor.setName(doctor.name());
-      existingDoctor.setPhone(doctor.phone());
-      updateDoctorAddress(existingDoctor, doctor.address());
+    existingDoctor.setName(doctor.name());
+    existingDoctor.setPhone(doctor.phone());
+    existingDoctor.setStatus(doctor.status());
+    updateDoctorAddress(existingDoctor, doctor.address());
 
-      return new DoctorDTO(this.doctorRepository.save(existingDoctor));
-    }
-    
-    return null;
+    return new DoctorDTO(this.doctorRepository.save(existingDoctor));
   }
 
   public DoctorDTO deactiveDoctorAccount (Long id) {
