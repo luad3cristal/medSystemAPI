@@ -1,22 +1,29 @@
 package ifba.edu.br.medSystemAPI.controllers;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import ifba.edu.br.medSystemAPI.dtos.auth.request.DoctorRegisterDTO;
 import ifba.edu.br.medSystemAPI.dtos.auth.request.LoginRequestDTO;
 import ifba.edu.br.medSystemAPI.dtos.auth.request.PatientRegisterDTO;
+import ifba.edu.br.medSystemAPI.dtos.auth.response.LoggedUserDTO;
 import ifba.edu.br.medSystemAPI.dtos.auth.response.LoginResponseDTO;
 import ifba.edu.br.medSystemAPI.models.entities.User;
 import ifba.edu.br.medSystemAPI.models.enums.Specialty;
 import ifba.edu.br.medSystemAPI.services.JWTokenService;
 import ifba.edu.br.medSystemAPI.services.UserService;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -50,6 +57,13 @@ public class AuthController {
         user.getRole().name(),
         user.getName(),
         user.getId()));
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<LoggedUserDTO> me() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    var user = (User) authentication.getPrincipal();
+    return ResponseEntity.ok(new LoggedUserDTO(user));
   }
 
   @PostMapping("/register/medico")

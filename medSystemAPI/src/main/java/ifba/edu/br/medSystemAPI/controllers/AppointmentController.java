@@ -8,15 +8,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ifba.edu.br.medSystemAPI.dtos.appointment.request.AppointmentCancelDTO;
 import ifba.edu.br.medSystemAPI.dtos.appointment.request.AppointmentCreateDTO;
 import ifba.edu.br.medSystemAPI.dtos.appointment.response.AppointmentDTO;
+import ifba.edu.br.medSystemAPI.models.enums.AppointmentStatus;
 import ifba.edu.br.medSystemAPI.services.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -46,9 +49,10 @@ public class AppointmentController {
       @ApiResponse(responseCode = "403", description = "Acesso negado - apenas ADMIN pode listar todas as consultas", content = @Content(mediaType = "application/json"))
   })
   public ResponseEntity<Page<AppointmentDTO>> getAppointments(
-      @PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable) {
+    @PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable,
+    @RequestParam(required = false) AppointmentStatus status) {
     return ResponseEntity.status(HttpStatus.OK)
-        .body(appointmentService.getAllAppointments(pageable));
+      .body(appointmentService.getAllAppointments(pageable, status));
   }
 
   @GetMapping("/{id}")
@@ -95,6 +99,19 @@ public class AppointmentController {
         .body(appointmentService.cancelAppointment(id, appointment));
   }
 
+    @PatchMapping("/{id}/complete")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ADMIN')")
+    @Operation(summary = "Concluir consulta (Médico ou ADMIN)", description = "Marca uma consulta como COMPLETED. Apenas consultas com status SCHEDULED podem ser concluídas.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Consulta concluída com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AppointmentDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Conclusão inválida (consulta já cancelada/concluída)", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Consulta não encontrada com o ID fornecido", content = @Content(mediaType = "application/json"))
+    })
+    public ResponseEntity<AppointmentDTO> completeAppointment(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(appointmentService.completeAppointment(id));
+    }
+
   @GetMapping("/patient/{patientId}/my-consultations")
   @PreAuthorize("hasAnyRole('PATIENT', 'ADMIN')")
   @Operation(summary = "Listar consultas do paciente", description = "Retorna todas as consultas de um paciente específico, ordenadas por data/hora. "
@@ -106,9 +123,10 @@ public class AppointmentController {
   })
   public ResponseEntity<Page<AppointmentDTO>> getPatientAppointments(
       @PathVariable Long patientId,
-      @PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable) {
+    @PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable,
+    @RequestParam(required = false) AppointmentStatus status) {
     return ResponseEntity.status(HttpStatus.OK)
-        .body(appointmentService.getPatientAppointments(patientId, pageable));
+      .body(appointmentService.getPatientAppointments(patientId, pageable, status));
   }
 
   @GetMapping("/doctor/{doctorId}/my-consultations")
@@ -122,9 +140,10 @@ public class AppointmentController {
   })
   public ResponseEntity<Page<AppointmentDTO>> getDoctorAppointments(
       @PathVariable Long doctorId,
-      @PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable) {
+    @PageableDefault(size = 10, sort = "appointmentTime") Pageable pageable,
+    @RequestParam(required = false) AppointmentStatus status) {
     return ResponseEntity.status(HttpStatus.OK)
-        .body(appointmentService.getDoctorAppointments(doctorId, pageable));
+      .body(appointmentService.getDoctorAppointments(doctorId, pageable, status));
   }
 
 }

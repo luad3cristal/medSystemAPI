@@ -8,4 +8,8 @@ import ifba.edu.br.medSystemAPI.models.entities.Patient;
 
 public interface PatientRepository extends JpaRepository <Patient, Long> {
     Page<Patient> findByStatus(Pageable pageable, Boolean status);
+
+    Page<Patient> findByStatusAndUserEnabled(Pageable pageable, Boolean status, Boolean enabled);
+
+    Page<Patient> findByUserEnabledTrue(Pageable pageable);
 }

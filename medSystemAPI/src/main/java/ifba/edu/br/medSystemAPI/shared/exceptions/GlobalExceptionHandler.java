@@ -1,5 +1,8 @@
 package ifba.edu.br.medSystemAPI.shared.exceptions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
 import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.AppointmentCannotBeCancelledException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.AppointmentCannotBeCompletedException;
 import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.AppointmentNotFoundException;
 import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.DoctorNotAvailableException;
 import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.InvalidAppointmentTimeException;
@@ -22,9 +26,6 @@ import ifba.edu.br.medSystemAPI.shared.exceptions.doctor.DuplicateDoctorExceptio
 import ifba.edu.br.medSystemAPI.shared.exceptions.patient.DuplicatePatientException;
 import ifba.edu.br.medSystemAPI.shared.exceptions.patient.PatientNotFoundException;
 import jakarta.validation.ConstraintViolationException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -85,6 +86,11 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(AppointmentCannotBeCancelledException.class)
   public ResponseEntity<String> handleAppointmentCannotBeCancelled(AppointmentCannotBeCancelledException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+  }
+
+  @ExceptionHandler(AppointmentCannotBeCompletedException.class)
+  public ResponseEntity<String> handleAppointmentCannotBeCompleted(AppointmentCannotBeCompletedException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
   }
 
