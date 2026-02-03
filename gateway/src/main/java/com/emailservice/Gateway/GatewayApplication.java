@@ -1,15 +1,14 @@
-package ifba.edu.br.medSystemAPI;
+package com.emailservice.Gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
-@EnableDiscoveryClient
 @SpringBootApplication
-public class MedSystemApiApplication {
+@EnableDiscoveryClient
+public class GatewayApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MedSystemApiApplication.class, args);
+		SpringApplication.run(GatewayApplication.class, args);
 	}
-
 }
