@@ -1,5 +1,7 @@
 package ifba.edu.br.medSystemAPI.services;
 
+import ifba.edu.br.medSystemAPI.clients.EmailClient;
+import ifba.edu.br.medSystemAPI.clients.EmailDTO;
 import ifba.edu.br.medSystemAPI.dtos.auth.request.DoctorRegisterDTO;
 import ifba.edu.br.medSystemAPI.dtos.auth.request.PatientRegisterDTO;
 import ifba.edu.br.medSystemAPI.dtos.auth.response.PendingUserDTO;
@@ -10,6 +12,8 @@ import ifba.edu.br.medSystemAPI.models.entities.User;
 import ifba.edu.br.medSystemAPI.models.enums.Role;
 import ifba.edu.br.medSystemAPI.models.enums.Specialty;
 import ifba.edu.br.medSystemAPI.repositories.UserRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +27,9 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  
+  @Autowired
+  private EmailClient emailClient;
 
   public UserService(UserRepository userRepository,
       PasswordEncoder passwordEncoder) {
@@ -95,6 +102,9 @@ public class UserService {
     patient.setUser(user);
 
     user.setPatient(patient);
+    
+    emailClient.sendEmail(new EmailDTO("20231160011@ifba.edu.br", dto.email(), "Bem-vindo ao MedSystem", "Olá " + dto.name() + ", seu cadastro foi realizado com sucesso!"));
+
 
     return userRepository.save(user);
   }

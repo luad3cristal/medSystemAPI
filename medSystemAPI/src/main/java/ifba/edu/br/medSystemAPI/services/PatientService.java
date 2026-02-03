@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import ifba.edu.br.medSystemAPI.clients.EmailClient;
+import ifba.edu.br.medSystemAPI.clients.EmailDTO;
 import ifba.edu.br.medSystemAPI.dtos.address.request.AddressRequestDTO;
 import ifba.edu.br.medSystemAPI.dtos.patient.request.PatientCreateDTO;
 import ifba.edu.br.medSystemAPI.dtos.patient.request.PatientUpdateDTO;
@@ -20,6 +22,7 @@ import jakarta.validation.ConstraintViolationException;
 public class PatientService {
   private PatientRepository patientRepository;
   private AddressService addressService;
+  private EmailClient emailClient;
 
 
   public PatientService (PatientRepository patientRepository, AddressService addressService) {
@@ -33,6 +36,8 @@ public class PatientService {
       Patient newPatient = new Patient(patient.name(), patient.email(), patient.phone(), patient.cpf(), patientAddress);
 
       Patient savedPatient = this.patientRepository.save(newPatient);
+      
+      emailClient.sendEmail(new EmailDTO("20231160011@ifba.edu.br", patient.email(), "Bem-vindo ao MedSystem", "Olá " + patient.name() + ", seu cadastro foi realizado com sucesso!"));
 
       return new PatientDTO(savedPatient);
     } 
