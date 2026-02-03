@@ -61,11 +61,11 @@ public class DoctorService {
   }
 
   public Page<DoctorDTO> listDoctorsByStatus(Pageable pageable, Boolean status) {
-    return this.doctorRepository.findByStatus(pageable, status).map(DoctorDTO::new);
+    return this.doctorRepository.findByStatusAndUserEnabled(pageable, status, true).map(DoctorDTO::new);
   }
 
   public Page<DoctorDTO> listAllDoctors(Pageable pageable) {
-    return this.doctorRepository.findAll(pageable).map(DoctorDTO::new);
+    return this.doctorRepository.findByUserEnabledTrue(pageable).map(DoctorDTO::new);
   }
 
   public void updateDoctorAddress (Doctor doctor, AddressRequestDTO address) {

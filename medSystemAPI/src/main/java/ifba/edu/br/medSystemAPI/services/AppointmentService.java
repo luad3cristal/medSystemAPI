@@ -51,7 +51,7 @@ public class AppointmentService {
   }
 
   private Doctor selectRandomDoctor(LocalDateTime appointmentTime) {
-    List<Doctor> allDoctors = doctorRepository.findAll()
+    List<Doctor> allDoctors = doctorRepository.findByUserEnabledTrue()
         .stream()
         .filter(this::isDoctorActive)
         .filter(doctor -> !isDoctorBusy(doctor, appointmentTime))
@@ -222,14 +222,15 @@ public class AppointmentService {
         throw new DoctorNotAvailableException(
             "CRM inválido: " + appointment.doctorCrm() + ". Formato esperado: CRM/UF 000000 (ex: CRM/SP 123456)");
       }
-      return this.doctorRepository.findByCrm(appointment.doctorCrm())
+      return this.doctorRepository.findByCrmAndUserEnabledTrue(appointment.doctorCrm())
           .orElseThrow(
               () -> new DoctorNotAvailableException("Médico não encontrado com CRM: " + appointment.doctorCrm()));
     }
 
     // Prioridade 2: Buscar por Nome
     if (appointment.doctorName() != null && !appointment.doctorName().trim().isEmpty()) {
-      List<Doctor> doctors = this.doctorRepository.findByNameContainingIgnoreCase(appointment.doctorName());
+      List<Doctor> doctors = this.doctorRepository.findByNameContainingIgnoreCaseAndUserEnabledTrue(
+          appointment.doctorName());
 
       if (doctors.isEmpty()) {
         throw new DoctorNotAvailableException("Nenhum médico encontrado com nome: " + appointment.doctorName());
