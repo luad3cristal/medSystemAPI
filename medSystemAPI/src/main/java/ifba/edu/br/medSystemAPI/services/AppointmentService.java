@@ -28,6 +28,7 @@ import ifba.edu.br.medSystemAPI.repositories.DoctorRepository;
 import ifba.edu.br.medSystemAPI.repositories.PatientRepository;
 import ifba.edu.br.medSystemAPI.shared.exceptions.AccessDeniedException;
 import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.AppointmentCannotBeCancelledException;
+import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.AppointmentCannotBeCompletedException;
 import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.AppointmentNotFoundException;
 import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.DoctorNotAvailableException;
 import ifba.edu.br.medSystemAPI.shared.exceptions.appointment.InvalidAppointmentTimeException;
@@ -170,13 +171,25 @@ public class AppointmentService {
 
   }
 
+  private void validateCompletionRules(Appointment appointment) {
+    if (appointment.getStatus() != AppointmentStatus.SCHEDULED) {
+      throw new AppointmentCannotBeCompletedException(appointment.getId(),
+          "Only scheduled appointments can be completed");
+    }
+  }
+
   public AppointmentDTO getAppointmentById(Long id) {
     return new AppointmentDTO(
         this.appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id)));
   }
 
-  public Page<AppointmentDTO> getAllAppointments(Pageable pageable) {
-    return this.appointmentRepository.findAll(pageable).map(AppointmentDTO::new);
+  public Page<AppointmentDTO> getAllAppointments(Pageable pageable, AppointmentStatus status) {
+    if (status == null) {
+      return this.appointmentRepository.findAll(pageable).map(AppointmentDTO::new);
+    }
+
+    return this.appointmentRepository.findByStatus(status, pageable)
+        .map(AppointmentDTO::new);
   }
 
   public AppointmentDTO scheduleAppointment(AppointmentCreateDTO appointment) {
@@ -252,34 +265,55 @@ public class AppointmentService {
     return new AppointmentDTO(this.appointmentRepository.save(existingAppointment));
   }
 
+  public AppointmentDTO completeAppointment(Long id) {
+    Appointment existingAppointment = appointmentRepository.findById(id)
+        .orElseThrow(() -> new AppointmentNotFoundException(id));
+
+    validateCompletionRules(existingAppointment);
+
+    existingAppointment.setStatus(AppointmentStatus.COMPLETED);
+
+    return new AppointmentDTO(this.appointmentRepository.save(existingAppointment));
+  }
+
   /**
    * Busca todas as consultas de um paciente específico (paginado)
    * Valida se o usuário tem permissão para acessar as consultas
    */
-  public Page<AppointmentDTO> getPatientAppointments(Long patientId, Pageable pageable) {
+  public Page<AppointmentDTO> getPatientAppointments(Long patientId, Pageable pageable, AppointmentStatus status) {
     Patient patient = patientRepository.findById(patientId)
         .orElseThrow(() -> new PatientNotFoundException(patientId));
 
     // Validar acesso: apenas o próprio paciente ou ADMIN pode ver
     validatePatientAccess(patient);
 
-    return appointmentRepository.findByPatient(patient, pageable)
+    if (status == null) {
+      return appointmentRepository.findByPatient(patient, pageable)
         .map(AppointmentDTO::new);
+    }
+
+    return appointmentRepository.findByPatientAndStatus(patient, status, pageable)
+      .map(AppointmentDTO::new);
   }
 
   /**
    * Busca todas as consultas de um médico específico (paginado)
    * Valida se o usuário tem permissão para acessar as consultas
    */
-  public Page<AppointmentDTO> getDoctorAppointments(Long doctorId, Pageable pageable) {
+  public Page<AppointmentDTO> getDoctorAppointments(Long doctorId, Pageable pageable, AppointmentStatus status) {
     Doctor doctor = doctorRepository.findById(doctorId)
         .orElseThrow(() -> new ifba.edu.br.medSystemAPI.shared.exceptions.doctor.DoctorNotFoundException(doctorId));
 
     // Validar acesso: apenas o próprio médico ou ADMIN pode ver
     validateDoctorAccess(doctor);
 
-    return appointmentRepository.findByDoctor(doctor, pageable)
+    if (status == null) {
+      return appointmentRepository.findByDoctor(doctor, pageable)
         .map(AppointmentDTO::new);
+    }
+
+    return appointmentRepository.findByDoctorAndStatus(doctor, status, pageable)
+      .map(AppointmentDTO::new);
   }
 
   /**
